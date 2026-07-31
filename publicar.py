@@ -59,6 +59,9 @@ print("=" * 58)
 arquivo = achar_json()
 print("\nArquivo do cardapio: " + arquivo)
 print("Salvo em            : " + time.strftime("%d/%m/%Y %H:%M", time.localtime(os.path.getmtime(arquivo))))
+print("\nConfira a data acima: tem que ser a do cardapio que voce acabou de exportar.")
+if input("Publicar esse cardapio? (s = sim) ").strip().lower() not in ("s", "sim", "y"):
+    raise SystemExit("\nCancelado. Nada foi publicado.")
 
 passo("1/4  aplicando o cardapio novo no template")
 rodar(PY, os.path.join(BASE, "aplicar.py"), arquivo)
