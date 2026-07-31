@@ -1,5 +1,6 @@
 template.html.bak
 cardapio*.json
 _preview_*.png
+_*.jpg
 *.pyc
 __pycache__/

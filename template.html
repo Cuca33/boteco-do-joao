@@ -53,13 +53,22 @@
   }
 
   :root{
+    --foto:url("data:image/webp;base64,__HERO_B64__");
+    --faixa:url("data:image/webp;base64,__FAIXA_B64__");
     --serif:Georgia,"Iowan Old Style","Noto Serif","Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
   }
 
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+    background:var(--foto) center/cover no-repeat;opacity:.07
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body::before{opacity:.12}}
+  :root[data-theme="dark"] body::before{opacity:.12}
+
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%;font-size:19px}
+  html{-webkit-text-size-adjust:100%;font-size:22px}
   body{
     margin:0;background:var(--bg);color:var(--texto);
     font-family:var(--sans);font-size:1rem;line-height:1.55;
@@ -72,9 +81,9 @@
 
   /* ---------- capa ---------- */
   .capa{position:relative;overflow:hidden;background:#0E0C0B;isolation:isolate}
-  .capa img.fundo{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    filter:saturate(.85) brightness(.42);z-index:-2
+  .capa .fundo{
+    position:absolute;inset:0;background:var(--foto) center/cover;
+    filter:saturate(.9) brightness(.4);z-index:-2
   }
   .capa::after{
     content:"";position:absolute;inset:0;z-index:-1;
@@ -141,7 +150,7 @@
 
   /* ---------- seções ---------- */
   main{padding-top:22px}
-  .secao{margin:0 0 30px;scroll-margin-top:142px}
+  .secao{margin:0 0 30px;scroll-margin-top:152px}
   .secao-topo{display:flex;align-items:baseline;gap:12px;margin-bottom:2px}
   .secao h2{
     font-family:var(--serif);font-weight:700;text-transform:uppercase;letter-spacing:.09em;
@@ -153,6 +162,15 @@
   .secao-regua{height:2px;background:var(--amarelo);opacity:.65;flex:1;border-radius:2px}
   .nota{
     font-size:.87rem;color:var(--texto-2);margin:2px 0 10px;font-style:italic
+  }
+
+  .faixa-foto{
+    height:104px;border-radius:10px;margin:0 0 10px;overflow:hidden;position:relative;
+    background:var(--faixa) center/cover;box-shadow:var(--sombra)
+  }
+  .faixa-foto::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(14,12,11,.15),rgba(14,12,11,.45))
   }
 
   .lista{
@@ -286,6 +304,7 @@
   footer .marca{font-family:var(--serif);letter-spacing:.1em;text-transform:uppercase;color:var(--texto)}
   footer .zap{color:var(--texto);font-weight:600;text-decoration:none;border-bottom:2px solid var(--amarelo);padding-bottom:1px}
   footer .zap:hover{color:var(--amarelo)}
+  footer .credito{font-size:.72rem;opacity:.6;margin-top:6px}
 
   /* ---------- deslizar entre seções ---------- */
   .chips-caixa{position:relative}
@@ -310,6 +329,23 @@
   }
   .sem-dialog.com-caixa body{overflow:hidden}
 
+  /* ---------- cadastro do cliente ---------- */
+  .tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .tipo{
+    min-width:0;border:1px solid var(--linha);background:var(--painel);
+    color:var(--texto-2);font:inherit;font-size:.78rem;font-weight:700;line-height:1.25;
+    padding:12px 6px;border-radius:9px;cursor:pointer;transition:background .12s ease
+  }
+  .tipo.ativo{background:var(--amarelo);border-color:var(--amarelo);color:#1C1811}
+  .dupla{display:flex;gap:10px}
+  .dupla .campo{flex:1;min-width:0}
+  .so-entrega{display:flex;flex-direction:column;gap:13px}
+  #dlg-cadastro[data-tipo="entrega"] .so-mesa{display:none}
+  #dlg-cadastro[data-tipo="retirada"] .so-entrega,
+  #dlg-cadastro[data-tipo="retirada"] .so-mesa{display:none}
+  #dlg-cadastro[data-tipo="mesa"] .so-entrega{display:none}
+  .campo input.falta{border-color:#C0392B;background:color-mix(in srgb,#C0392B 7%,var(--bg))}
+
   /* ---------- painel do dono ---------- */
   .dono-link{
     border:0;background:none;color:var(--texto-2);font:inherit;font-size:.76rem;
@@ -331,7 +367,7 @@
   }
   body.adm .adm-barra{display:block}
   body.adm .balcao{top:46px}
-  body.adm .secao{scroll-margin-top:188px}
+  body.adm .secao{scroll-margin-top:198px}
   .adm-barra-in{
     max-width:780px;margin:0 auto;padding:0 14px;height:46px;
     display:flex;align-items:center;gap:7px
@@ -385,6 +421,7 @@
   @media print{
     body{background:#fff;color:#000;padding:0}
     .balcao,.barra,main>.secao,.capa,footer,.qr-acoes,.adm-barra,.balao,.adm-dica{display:none!important}
+    body::before{display:none!important}
     .qr-bloco{border:0;box-shadow:none;margin:0;padding:0}
     .qr-caixa svg{width:70mm}
   }
@@ -403,7 +440,7 @@
 </div>
 
 <header class="capa">
-  <img class="fundo" src="data:image/webp;base64,__HERO_B64__" alt="">
+  <div class="fundo" aria-hidden="true"></div>
   <div class="capa-in">
     <img class="selo" src="data:image/webp;base64,__LOGO_B64__" alt="Logotipo do Boteco do João">
     <h1>Boteco do João</h1>
@@ -449,6 +486,7 @@
   <div class="marca">Boteco do João</div>
   <div><a class="zap" href="https://wa.me/5571991232952" target="_blank" rel="noopener">Pedidos e reservas: (71) 99123-2952</a></div>
   <div>Preços sujeitos a alteração. Cervejas 600&nbsp;ml: consultar valor com o garçom.</div>
+  <div class="credito">Fotos dos espetinhos: Pattaya Patrol / Wikimedia Commons — CC BY-SA 4.0</div>
   <div><button class="dono-link" id="abrir-dono" type="button">Área do dono</button></div>
 </footer>
 
@@ -471,6 +509,75 @@
     <button class="btn principal" id="enviar" type="button">Enviar pedido pelo WhatsApp</button>
     <button class="btn fraco" id="limpar-comanda" type="button">Limpar comanda</button>
     <p class="aviso">Esta lista é só para você se organizar — o pedido é confirmado com o garçom.</p>
+  </div>
+</dialog>
+
+<dialog class="comanda" id="dlg-cadastro" data-tipo="entrega">
+  <div class="cab">
+    <h2>Seus dados</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <div class="tipos" id="tipos">
+      <button class="tipo ativo" type="button" data-tipo="entrega">Entrega</button>
+      <button class="tipo" type="button" data-tipo="retirada">Retirar no local</button>
+      <button class="tipo" type="button" data-tipo="mesa">Estou na mesa</button>
+    </div>
+
+    <div class="campo">
+      <label for="c-nome">Seu nome</label>
+      <input id="c-nome" autocomplete="name" autocapitalize="words" placeholder="Nome e sobrenome">
+    </div>
+    <div class="campo">
+      <label for="c-fone">Telefone / WhatsApp</label>
+      <input id="c-fone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(71) 9 9999-9999">
+    </div>
+
+    <div class="campo so-mesa">
+      <label for="c-mesa">Número da mesa</label>
+      <input id="c-mesa" inputmode="numeric" placeholder="ex.: 7">
+    </div>
+
+    <div class="so-entrega">
+      <div class="campo">
+        <label for="c-rua">Rua / Avenida</label>
+        <input id="c-rua" autocomplete="address-line1" autocapitalize="words" placeholder="Rua das Flores">
+      </div>
+      <div class="dupla">
+        <div class="campo">
+          <label for="c-num">Número</label>
+          <input id="c-num" inputmode="numeric" placeholder="123">
+        </div>
+        <div class="campo">
+          <label for="c-compl">Complemento</label>
+          <input id="c-compl" placeholder="apto, bloco…">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="c-bairro">Bairro</label>
+        <input id="c-bairro" autocapitalize="words" placeholder="Centro">
+      </div>
+      <div class="campo">
+        <label for="c-cidade">Cidade</label>
+        <input id="c-cidade" autocapitalize="words" placeholder="Salvador">
+      </div>
+      <div class="campo">
+        <label for="c-ref">Ponto de referência</label>
+        <input id="c-ref" placeholder="opcional — ex.: em frente à praça">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="c-obs">Observação do pedido</label>
+      <input id="c-obs" placeholder="opcional — ex.: sem cebola, troco para R$ 100">
+    </div>
+    <p class="erro" id="c-erro"></p>
+    <p class="dica">Seus dados ficam guardados só neste celular, para não digitar tudo de novo na próxima vez.</p>
+  </div>
+  <div class="rodape-comanda">
+    <div class="total"><span>Total</span><span id="c-total">R$ 0,00</span></div>
+    <button class="btn principal" id="c-enviar" type="button">Enviar pedido pelo WhatsApp</button>
+    <button class="btn fraco" id="c-voltar" type="button">Voltar para a comanda</button>
   </div>
 </dialog>
 
@@ -683,7 +790,7 @@ const CARDAPIO_PADRAO = [
    {cod:"862", nome:"Isca de Frango c/ Fritas", preco:48.99},
    {cod:"849", nome:"Isca de Frango c/ Farofa e Vinagrete", preco:43.99}
  ]},
- {id:"espetinhos", nome:"Espetinhos", itens:[
+ {id:"espetinhos", nome:"Espetinhos", faixa:true, itens:[
    {cod:"015", nome:"Pão de Alho", preco:8.00},
    {cod:"013", nome:"Bisteca", preco:14.00},
    {cod:"012", nome:"Coração", preco:12.00},
@@ -963,6 +1070,12 @@ function montar(){
       s.append(n);
     }
 
+    if (sec.faixa){
+      const f = document.createElement("div");
+      f.className = "faixa-foto";
+      s.append(f);
+    }
+
     const barraSec = document.createElement("div");
     barraSec.className = "adm-sec";
     barraSec.append(
@@ -1045,7 +1158,7 @@ function montar(){
         behavior: "smooth"
       });
     });
-  }, {rootMargin:"-146px 0px -70% 0px", threshold:0});
+  }, {rootMargin:"-156px 0px -70% 0px", threshold:0});
   document.querySelectorAll(".secao").forEach(s => observador.observe(s));
 
   filtrar();
@@ -1055,7 +1168,7 @@ function montar(){
 function secaoAtual(){
   const secoes = [...document.querySelectorAll(".secao")].filter(s => s.style.display !== "none");
   if (!secoes.length) return {secoes: [], i: 0};
-  const alvo = 165;                       // logo abaixo da barra de busca
+  const alvo = 175;                       // logo abaixo da barra de busca
   let i = 0, melhor = Infinity;
   secoes.forEach((s, k) => {
     const d = Math.abs(s.getBoundingClientRect().top - alvo);
@@ -1225,7 +1338,67 @@ document.getElementById("limpar-comanda").addEventListener("click", () => {
 });
 dlg.addEventListener("click", e => { if (e.target === dlg) fecharDlg(dlg); });
 
+/* ============================================================
+   CADASTRO DO CLIENTE — nome, contato e endereço antes de enviar
+   ============================================================ */
+const CHAVE_CLIENTE = "boteco-do-joao/cliente";
+const dlgCad = document.getElementById("dlg-cadastro");
+const campoCad = {
+  nome: "c-nome", fone: "c-fone", mesa: "c-mesa", rua: "c-rua", num: "c-num",
+  compl: "c-compl", bairro: "c-bairro", cidade: "c-cidade", ref: "c-ref"
+};
+
+function lerCliente(){
+  const c = {tipo: dlgCad.dataset.tipo || "entrega"};
+  for (const k in campoCad) c[k] = document.getElementById(campoCad[k]).value.trim();
+  c.obs = document.getElementById("c-obs").value.trim();
+  return c;
+}
+
+function escreverCliente(c){
+  dlgCad.dataset.tipo = c.tipo || "entrega";
+  document.querySelectorAll("#tipos .tipo").forEach(b =>
+    b.classList.toggle("ativo", b.dataset.tipo === dlgCad.dataset.tipo));
+  for (const k in campoCad) document.getElementById(campoCad[k]).value = c[k] || "";
+}
+
+function guardarCliente(c){
+  const guardar = Object.assign({}, c);
+  delete guardar.obs;                       // observação é só daquele pedido
+  try{ localStorage.setItem(CHAVE_CLIENTE, JSON.stringify(guardar)); }catch(e){}
+}
+
+function clienteGuardado(){
+  try{
+    const g = JSON.parse(localStorage.getItem(CHAVE_CLIENTE));
+    if (g && typeof g === "object") return g;
+  }catch(e){}
+  return {tipo: "entrega"};
+}
+
+document.querySelectorAll("#tipos .tipo").forEach(b => b.addEventListener("click", () => {
+  dlgCad.dataset.tipo = b.dataset.tipo;
+  document.querySelectorAll("#tipos .tipo").forEach(o => o.classList.toggle("ativo", o === b));
+  document.getElementById("c-erro").classList.remove("on");
+}));
+
+function faltando(){
+  const c = lerCliente();
+  const falta = [];
+  if (!c.nome) falta.push("nome");
+  if (c.fone.replace(/\D/g, "").length < 10) falta.push("fone");
+  if (c.tipo === "entrega"){
+    if (!c.rua) falta.push("rua");
+    if (!c.num) falta.push("num");
+    if (!c.bairro) falta.push("bairro");
+    if (!c.cidade) falta.push("cidade");
+  }
+  if (c.tipo === "mesa" && !c.mesa) falta.push("mesa");
+  return falta;
+}
+
 function textoPedido(){
+  const c = lerCliente();
   const linhas = ["*Pedido — " + CONFIG.nome + "*", ""];
   let total = 0;
   comanda.forEach((n, k) => {
@@ -1235,13 +1408,61 @@ function textoPedido(){
     linhas.push(n + "x " + (it.cod ? "(" + it.cod + ") " : "") + it.nome +
       (it.preco == null ? " — a consultar" : " — " + real(it.preco * n)));
   });
-  linhas.push("", "Total: " + real(total));
+  linhas.push("", "*Total: " + real(total) + "*", "");
+
+  const rotulo = {entrega: "ENTREGA", retirada: "RETIRAR NO LOCAL", mesa: "MESA"}[c.tipo];
+  linhas.push("*" + rotulo + "*");
+  if (c.nome) linhas.push("Nome: " + c.nome);
+  if (c.fone) linhas.push("Telefone: " + c.fone);
+  if (c.tipo === "mesa" && c.mesa) linhas.push("Mesa: " + c.mesa);
+  if (c.tipo === "entrega"){
+    linhas.push("Endereço: " + c.rua + ", " + c.num + (c.compl ? " — " + c.compl : ""));
+    linhas.push("Bairro: " + c.bairro);
+    if (c.cidade) linhas.push("Cidade: " + c.cidade);
+    if (c.ref) linhas.push("Referência: " + c.ref);
+  }
+  if (c.obs) linhas.push("", "Obs.: " + c.obs);
   return linhas.join("\n");
 }
 
+/* a comanda agora leva para o cadastro */
 const btnEnviar = document.getElementById("enviar");
-if (!CONFIG.whatsapp) btnEnviar.textContent = "Copiar pedido";
-btnEnviar.addEventListener("click", async () => {
+btnEnviar.textContent = "Continuar";
+btnEnviar.addEventListener("click", () => {
+  if (!comanda.size) return;
+  escreverCliente(clienteGuardado());
+  document.getElementById("c-obs").value = "";
+  document.getElementById("c-erro").classList.remove("on");
+  document.querySelectorAll("#dlg-cadastro input").forEach(i => i.classList.remove("falta"));
+  document.getElementById("c-total").textContent = elTotal.textContent;
+  fecharDlg(dlg);
+  abrirDlg(dlgCad);
+  setTimeout(() => { if (!document.getElementById("c-nome").value) document.getElementById("c-nome").focus(); }, 120);
+});
+
+document.getElementById("c-voltar").addEventListener("click", () => {
+  fecharDlg(dlgCad);
+  abrirDlg(dlg);
+});
+
+const btnEnviarFinal = document.getElementById("c-enviar");
+if (!CONFIG.whatsapp) btnEnviarFinal.textContent = "Copiar pedido";
+btnEnviarFinal.addEventListener("click", async () => {
+  const falta = faltando();
+  const erro = document.getElementById("c-erro");
+  document.querySelectorAll("#dlg-cadastro input").forEach(i => i.classList.remove("falta"));
+  if (falta.length){
+    falta.forEach(k => document.getElementById(campoCad[k]).classList.add("falta"));
+    erro.textContent = falta.includes("fone") && falta.length === 1
+      ? "Confira o telefone — precisa do DDD."
+      : "Preencha os campos marcados para o pedido chegar certinho.";
+    erro.classList.add("on");
+    document.getElementById(campoCad[falta[0]]).focus();
+    return;
+  }
+  erro.classList.remove("on");
+  guardarCliente(lerCliente());
+
   const txt = textoPedido();
   if (CONFIG.whatsapp){
     window.open("https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(txt), "_blank", "noopener");
@@ -1249,11 +1470,11 @@ btnEnviar.addEventListener("click", async () => {
   }
   try{
     await navigator.clipboard.writeText(txt);
-    btnEnviar.textContent = "Pedido copiado!";
-    setTimeout(() => btnEnviar.textContent = "Copiar pedido", 1800);
+    btnEnviarFinal.textContent = "Pedido copiado!";
+    setTimeout(() => btnEnviarFinal.textContent = "Copiar pedido", 1800);
   }catch(e){
-    btnEnviar.textContent = "Não deu para copiar";
-    setTimeout(() => btnEnviar.textContent = "Copiar pedido", 1800);
+    btnEnviarFinal.textContent = "Não deu para copiar";
+    setTimeout(() => btnEnviarFinal.textContent = "Copiar pedido", 1800);
   }
 });
 
@@ -1285,7 +1506,7 @@ const dlgLogin = $("dlg-login"), dlgItem = $("dlg-item"), dlgSecao = $("dlg-seca
 
 document.querySelectorAll("[data-fecha]").forEach(b =>
   b.addEventListener("click", () => fecharDlg(b.closest("dialog"))));
-document.querySelectorAll(".adm-dlg").forEach(d =>
+document.querySelectorAll("dialog.comanda").forEach(d =>
   d.addEventListener("click", e => { if (e.target === d) fecharDlg(d); }));
 
 let avisoTimer = null;
