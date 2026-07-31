@@ -48,8 +48,6 @@ for si, sec in enumerate(dados):
     cab = " {id:%s, nome:%s" % (txt(sec.get("id") or "s%d" % si), txt(sec["nome"]))
     if sec.get("destaque"):
         cab += ", destaque:true"
-    if sec.get("faixa"):
-        cab += ", faixa:true"
     if sec.get("nota"):
         cab += ", nota:%s" % txt(sec["nota"])
     linhas.append(cab + ", itens:[")

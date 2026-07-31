@@ -54,7 +54,6 @@
 
   :root{
     --foto:url("data:image/webp;base64,__HERO_B64__");
-    --faixa:url("data:image/webp;base64,__FAIXA_B64__");
     --serif:Georgia,"Iowan Old Style","Noto Serif","Times New Roman",serif;
     --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
@@ -165,12 +164,13 @@
   }
 
   .faixa-foto{
-    height:104px;border-radius:10px;margin:0 0 10px;overflow:hidden;position:relative;
-    background:var(--faixa) center/cover;box-shadow:var(--sombra)
+    height:108px;border-radius:10px;margin:0 0 10px;overflow:hidden;position:relative;
+    background:var(--chip);box-shadow:var(--sombra)
   }
+  .faixa-foto img{width:100%;height:100%;object-fit:cover;display:block}
   .faixa-foto::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(14,12,11,.15),rgba(14,12,11,.45))
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(14,12,11,.10),rgba(14,12,11,.34))
   }
 
   .lista{
@@ -304,7 +304,10 @@
   footer .marca{font-family:var(--serif);letter-spacing:.1em;text-transform:uppercase;color:var(--texto)}
   footer .zap{color:var(--texto);font-weight:600;text-decoration:none;border-bottom:2px solid var(--amarelo);padding-bottom:1px}
   footer .zap:hover{color:var(--amarelo)}
-  footer .credito{font-size:.72rem;opacity:.6;margin-top:6px}
+  footer .creditos{margin-top:10px;font-size:.7rem;opacity:.62;text-align:left;max-width:46ch;margin-inline:auto}
+  footer .creditos summary{cursor:pointer;text-align:center;opacity:.9}
+  footer .creditos ul{list-style:none;margin:8px 0 0;padding:0;line-height:1.5}
+  footer .creditos li{margin:0 0 2px}
 
   /* ---------- deslizar entre seções ---------- */
   .chips-caixa{position:relative}
@@ -486,7 +489,10 @@
   <div class="marca">Boteco do João</div>
   <div><a class="zap" href="https://wa.me/5571991232952" target="_blank" rel="noopener">Pedidos e reservas: (71) 99123-2952</a></div>
   <div>Preços sujeitos a alteração. Cervejas 600&nbsp;ml: consultar valor com o garçom.</div>
-  <div class="credito">Fotos dos espetinhos: Pattaya Patrol / Wikimedia Commons — CC BY-SA 4.0</div>
+  <details class="creditos">
+    <summary>Créditos das fotos</summary>
+    <ul>__CREDITOS__</ul>
+  </details>
   <div><button class="dono-link" id="abrir-dono" type="button">Área do dono</button></div>
 </footer>
 
@@ -790,7 +796,7 @@ const CARDAPIO_PADRAO = [
    {cod:"862", nome:"Isca de Frango c/ Fritas", preco:48.99},
    {cod:"849", nome:"Isca de Frango c/ Farofa e Vinagrete", preco:43.99}
  ]},
- {id:"espetinhos", nome:"Espetinhos", faixa:true, itens:[
+ {id:"espetinhos", nome:"Espetinhos", itens:[
    {cod:"015", nome:"Pão de Alho", preco:8.00},
    {cod:"013", nome:"Bisteca", preco:14.00},
    {cod:"012", nome:"Coração", preco:12.00},
@@ -1070,9 +1076,16 @@ function montar(){
       s.append(n);
     }
 
-    if (sec.faixa){
+    if (sec.id){
       const f = document.createElement("div");
       f.className = "faixa-foto";
+      const img = document.createElement("img");
+      img.src = "fotos/" + sec.id + ".webp";
+      img.alt = "";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.addEventListener("error", () => f.remove());   // seção sem foto fica sem faixa
+      f.append(img);
       s.append(f);
     }
 
