@@ -1,0 +1,1492 @@
+<meta charset="utf-8">
+<title>Boteco do João — Cardápio</title>
+<style>
+  :root{
+    --amarelo:#F2B32E;
+    --amarelo-claro:#FFD168;
+    --tijolo:#A63D1B;
+    --bg:#F6EEDF;
+    --painel:#FFFAF1;
+    --linha:#E2D5BC;
+    --texto:#1C1811;
+    --texto-2:#6E6250;
+    --chip:#ECE1CB;
+    --sombra:0 1px 2px rgba(28,24,17,.06), 0 8px 24px rgba(28,24,17,.06);
+    --topo:rgba(246,238,223,.92);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#131110;
+      --painel:#1C1917;
+      --linha:#332C23;
+      --texto:#F5EDDF;
+      --texto-2:#A2957F;
+      --chip:#2A2520;
+      --sombra:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+      --topo:rgba(19,17,16,.92);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F6EEDF; --painel:#FFFAF1; --linha:#E2D5BC; --texto:#1C1811;
+    --texto-2:#6E6250; --chip:#ECE1CB;
+    --sombra:0 1px 2px rgba(28,24,17,.06), 0 8px 24px rgba(28,24,17,.06);
+    --topo:rgba(246,238,223,.92);
+  }
+  :root[data-theme="dark"]{
+    --bg:#131110; --painel:#1C1917; --linha:#332C23; --texto:#F5EDDF;
+    --texto-2:#A2957F; --chip:#2A2520;
+    --sombra:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+    --topo:rgba(19,17,16,.92);
+  }
+
+  :root{
+    --serif:Georgia,"Iowan Old Style","Noto Serif","Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--texto);
+    font-family:var(--sans);font-size:16px;line-height:1.5;
+    padding-bottom:96px;
+  }
+  a{color:inherit}
+  ::selection{background:var(--amarelo);color:#1C1811}
+
+  .wrap{max-width:780px;margin:0 auto;padding:0 18px}
+
+  /* ---------- capa ---------- */
+  .capa{position:relative;overflow:hidden;background:#0E0C0B;isolation:isolate}
+  .capa img.fundo{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    filter:saturate(.85) brightness(.42);z-index:-2
+  }
+  .capa::after{
+    content:"";position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg,rgba(14,12,11,.25) 0%,rgba(14,12,11,.55) 55%,var(--bg) 100%)
+  }
+  .capa-in{padding:34px 18px 26px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .selo{
+    width:172px;height:172px;border-radius:50%;display:block;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+  .capa h1{
+    font-family:var(--serif);font-weight:700;font-size:clamp(1.7rem,7vw,2.5rem);
+    letter-spacing:.06em;text-transform:uppercase;margin:0;color:#FFF7E7;text-wrap:balance;
+    text-shadow:0 2px 12px rgba(0,0,0,.6)
+  }
+  .capa p{
+    margin:0;font-family:var(--serif);font-style:italic;font-size:1.02rem;
+    color:var(--amarelo);letter-spacing:.02em;text-shadow:0 2px 10px rgba(0,0,0,.6)
+  }
+  .faixa{
+    display:inline-block;background:var(--amarelo);color:#1C1811;font-weight:700;
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    padding:6px 14px;border-radius:2px
+  }
+
+  /* ---------- barra de busca ---------- */
+  .balcao{
+    position:sticky;top:0;z-index:30;background:var(--topo);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--linha)
+  }
+  .busca-linha{display:flex;gap:10px;align-items:center;padding:12px 0 10px}
+  .busca{
+    flex:1;display:flex;align-items:center;gap:8px;background:var(--painel);
+    border:1px solid var(--linha);border-radius:999px;padding:9px 14px;box-shadow:var(--sombra)
+  }
+  .busca svg{flex:none;opacity:.55}
+  .busca input{
+    flex:1;border:0;background:none;color:var(--texto);font:inherit;font-size:1rem;outline:none;min-width:0
+  }
+  .busca input::placeholder{color:var(--texto-2)}
+  .limpar{
+    border:0;background:none;color:var(--texto-2);font:inherit;font-size:1.2rem;
+    line-height:1;cursor:pointer;padding:0 2px;display:none
+  }
+  .limpar.on{display:block}
+
+  .chips{
+    display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;
+    scrollbar-width:none;-ms-overflow-style:none
+  }
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none;border:1px solid var(--linha);background:var(--chip);color:var(--texto);
+    font:inherit;font-size:.83rem;font-weight:600;letter-spacing:.02em;
+    padding:7px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;
+    transition:background .15s ease,color .15s ease,border-color .15s ease
+  }
+  .chip:hover{border-color:var(--amarelo)}
+  .chip.ativo{background:var(--amarelo);border-color:var(--amarelo);color:#1C1811}
+  .chip:focus-visible,.limpar:focus-visible,.item:focus-visible,.btn:focus-visible,.qtd b:focus-visible{
+    outline:2px solid var(--amarelo);outline-offset:2px
+  }
+
+  /* ---------- seções ---------- */
+  main{padding-top:22px}
+  .secao{margin:0 0 30px;scroll-margin-top:126px}
+  .secao-topo{display:flex;align-items:baseline;gap:12px;margin-bottom:2px}
+  .secao h2{
+    font-family:var(--serif);font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+    font-size:1.06rem;margin:0;color:var(--amarelo);text-wrap:balance
+  }
+  :root[data-theme="light"] .secao h2,
+  :root:not([data-theme="dark"]) .secao h2{color:#8A6410}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .secao h2{color:var(--amarelo)}}
+  .secao-regua{height:2px;background:var(--amarelo);opacity:.65;flex:1;border-radius:2px}
+  .nota{
+    font-size:.8rem;color:var(--texto-2);margin:2px 0 10px;font-style:italic
+  }
+
+  .lista{
+    background:var(--painel);border:1px solid var(--linha);border-radius:10px;
+    overflow:hidden;box-shadow:var(--sombra)
+  }
+  .item{
+    display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;
+    background:none;border:0;border-top:1px solid var(--linha);
+    color:inherit;font:inherit;padding:11px 14px;cursor:pointer;
+    transition:background .12s ease
+  }
+  .item:first-child{border-top:0}
+  .item:hover{background:color-mix(in srgb,var(--amarelo) 10%,transparent)}
+  .item:active{background:color-mix(in srgb,var(--amarelo) 20%,transparent)}
+  .cod{
+    font-family:var(--mono);font-size:.74rem;color:var(--texto-2);
+    background:var(--chip);border-radius:4px;padding:2px 6px;flex:none;
+    letter-spacing:.02em
+  }
+  .nome{flex:none;max-width:calc(100% - 190px)}
+  .pontos{flex:1;border-bottom:1px dotted var(--linha);transform:translateY(-.3em);min-width:12px}
+  .preco{
+    flex:none;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+    white-space:nowrap
+  }
+  @media (max-width:560px){
+    .nome{max-width:none;flex:1}
+    .pontos{display:none}
+  }
+  .preco.consulte{font-weight:600;font-size:.82rem;color:var(--texto-2);text-transform:uppercase;letter-spacing:.08em}
+  .mais{
+    flex:none;width:22px;height:22px;border-radius:50%;background:var(--chip);
+    color:var(--texto-2);display:grid;place-items:center;font-size:1rem;line-height:1;
+    align-self:center;font-weight:700
+  }
+  .item:hover .mais{background:var(--amarelo);color:#1C1811}
+  .item .desc{
+    display:block;font-size:.85rem;color:var(--texto-2);line-height:1.45;margin-top:4px;
+    max-width:60ch
+  }
+  .item.grande{flex-wrap:wrap}
+  .item.grande .nome{max-width:none;flex:1;font-family:var(--serif);font-size:1.05rem;font-weight:700}
+  .item.grande .pontos{display:none}
+  .item.grande .desc{flex-basis:100%}
+
+  .vazio{
+    text-align:center;color:var(--texto-2);padding:40px 12px;font-style:italic;display:none
+  }
+  .vazio.on{display:block}
+
+  /* ---------- comanda ---------- */
+  .barra{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    transform:translateY(130%);transition:transform .25s cubic-bezier(.22,1,.36,1);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:var(--topo);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-top:1px solid var(--linha)
+  }
+  .barra.on{transform:translateY(0)}
+  .barra-in{
+    max-width:780px;margin:0 auto;display:flex;align-items:center;gap:12px;
+    background:var(--amarelo);color:#1C1811;border-radius:10px;padding:11px 14px;
+    cursor:pointer;box-shadow:var(--sombra);border:0;font:inherit;width:100%
+  }
+  .barra-in strong{font-variant-numeric:tabular-nums}
+  .barra-in .cresce{flex:1;text-align:left;font-weight:600}
+  .barra-in .seta{font-weight:700}
+
+  dialog.comanda{
+    border:0;padding:0;background:var(--painel);color:var(--texto);
+    width:min(560px,100%);max-height:86vh;border-radius:14px 14px 0 0;
+    margin:auto auto 0;box-shadow:0 -10px 50px rgba(0,0,0,.35)
+  }
+  dialog.comanda::backdrop{background:rgba(10,8,6,.6)}
+  .cab{
+    display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--linha)
+  }
+  .cab h2{
+    font-family:var(--serif);text-transform:uppercase;letter-spacing:.08em;font-size:1rem;margin:0;flex:1
+  }
+  .fechar{border:0;background:var(--chip);color:var(--texto);border-radius:50%;width:30px;height:30px;font-size:1.1rem;cursor:pointer;line-height:1}
+  .pedido{list-style:none;margin:0;padding:6px 18px;overflow-y:auto;max-height:44vh}
+  .pedido li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linha)}
+  .pedido li:last-child{border-bottom:0}
+  .pedido .p-nome{flex:1;font-size:.95rem}
+  .pedido .p-cod{font-family:var(--mono);font-size:.72rem;color:var(--texto-2)}
+  .pedido .p-preco{font-variant-numeric:tabular-nums;font-weight:700;min-width:78px;text-align:right}
+  .qtd{display:flex;align-items:center;gap:2px;background:var(--chip);border-radius:999px;padding:2px}
+  .qtd b{
+    width:26px;height:26px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+    font-size:1rem;background:var(--painel);user-select:none
+  }
+  .qtd span{min-width:22px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700}
+  .rodape-comanda{padding:14px 18px calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--linha);display:flex;flex-direction:column;gap:10px}
+  .total{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--serif);font-size:1.15rem;font-weight:700}
+  .total span:last-child{font-variant-numeric:tabular-nums}
+  .btn{
+    border:0;border-radius:9px;padding:13px 16px;font:inherit;font-weight:700;cursor:pointer;
+    text-align:center;text-decoration:none;display:block
+  }
+  .btn.principal{background:var(--amarelo);color:#1C1811}
+  .btn.fraco{background:var(--chip);color:var(--texto-2);font-weight:600;padding:9px}
+  .aviso{font-size:.78rem;color:var(--texto-2);text-align:center;line-height:1.4}
+
+  /* ---------- QR ---------- */
+  .qr-bloco{
+    background:var(--painel);border:1px solid var(--linha);border-radius:12px;
+    padding:22px;text-align:center;box-shadow:var(--sombra);margin:34px 0 26px
+  }
+  .qr-bloco h2{
+    font-family:var(--serif);text-transform:uppercase;letter-spacing:.09em;font-size:1rem;
+    margin:0 0 6px;color:var(--texto)
+  }
+  .qr-bloco p{margin:0 auto 16px;color:var(--texto-2);font-size:.9rem;max-width:44ch}
+  .qr-caixa{
+    display:inline-block;background:#fff;padding:14px;border-radius:10px;line-height:0;
+    border:1px solid var(--linha)
+  }
+  .qr-caixa svg{width:min(230px,60vw);height:auto;display:block}
+  .qr-link{
+    display:block;margin-top:14px;font-family:var(--mono);font-size:.76rem;color:var(--texto-2);
+    word-break:break-all
+  }
+  .qr-acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .qr-acoes .btn{padding:10px 18px;font-size:.9rem}
+
+  footer{
+    text-align:center;color:var(--texto-2);font-size:.82rem;padding:6px 0 34px;line-height:1.6
+  }
+  footer .marca{font-family:var(--serif);letter-spacing:.1em;text-transform:uppercase;color:var(--texto)}
+  footer .zap{color:var(--texto);font-weight:600;text-decoration:none;border-bottom:2px solid var(--amarelo);padding-bottom:1px}
+  footer .zap:hover{color:var(--amarelo)}
+
+  /* ---------- painel do dono ---------- */
+  .adm-barra{
+    display:none;position:sticky;top:0;z-index:60;
+    background:var(--tijolo);color:#FFF3E0;box-shadow:0 4px 18px rgba(0,0,0,.28)
+  }
+  body.adm .adm-barra{display:block}
+  body.adm .balcao{top:46px}
+  body.adm .secao{scroll-margin-top:172px}
+  .adm-barra-in{
+    max-width:780px;margin:0 auto;padding:0 14px;height:46px;
+    display:flex;align-items:center;gap:7px
+  }
+  .adm-tag{
+    flex:1;min-width:0;font-size:.78rem;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  }
+  .adm-b{
+    flex:none;border:0;border-radius:7px;background:rgba(255,255,255,.17);color:#FFF3E0;
+    font:inherit;font-size:.8rem;font-weight:700;padding:7px 11px;cursor:pointer;white-space:nowrap
+  }
+  .adm-b:hover{background:rgba(255,255,255,.3)}
+  .adm-b.destaque{background:var(--amarelo);color:#1C1811}
+  .adm-b:focus-visible,.adm-s:focus-visible{outline:2px solid #FFF3E0;outline-offset:2px}
+
+  .adm-sec{display:none;gap:6px;flex-wrap:wrap;margin:7px 0 9px}
+  body.adm .adm-sec{display:flex}
+  .adm-s{
+    border:1px dashed var(--linha);background:var(--painel);color:var(--texto-2);
+    font:inherit;font-size:.76rem;font-weight:600;border-radius:7px;padding:5px 10px;cursor:pointer
+  }
+  .adm-s:hover{border-color:var(--amarelo);color:var(--texto)}
+  .adm-s.forte{border-style:solid;border-color:var(--amarelo);color:var(--texto)}
+  body.adm .mais{background:var(--tijolo);color:#FFF3E0;font-size:.78rem}
+  body.adm .item:hover .mais{background:var(--tijolo);color:#FFF3E0}
+
+  .campos{padding:14px 18px;display:flex;flex-direction:column;gap:13px;overflow-y:auto;max-height:52vh}
+  .campo{display:flex;flex-direction:column;gap:5px}
+  .campo label{
+    font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--texto-2)
+  }
+  .campo input,.campo textarea,.campo select{
+    font:inherit;font-size:1rem;color:var(--texto);background:var(--bg);width:100%;
+    border:1px solid var(--linha);border-radius:9px;padding:11px 12px;outline:none
+  }
+  .campo input:focus,.campo textarea:focus,.campo select:focus{border-color:var(--amarelo)}
+  .campo textarea{resize:vertical;min-height:74px;line-height:1.45}
+  .dica{font-size:.77rem;color:var(--texto-2);line-height:1.45;margin:0}
+  .linha-btn{display:flex;gap:8px;flex-wrap:wrap}
+  .linha-btn .btn{flex:1;min-width:118px}
+  .btn.perigo{background:#8E2B12;color:#FFF3E0}
+  .erro{color:#C0392B;font-size:.85rem;font-weight:600;margin:0;display:none}
+  .erro.on{display:block}
+  .saida{
+    font-family:var(--mono);font-size:.7rem;line-height:1.4;width:100%;height:130px;
+    background:var(--bg);color:var(--texto-2);border:1px solid var(--linha);
+    border-radius:9px;padding:10px;resize:vertical
+  }
+
+  @media print{
+    body{background:#fff;color:#000;padding:0}
+    .balcao,.barra,main>.secao,.capa,footer,.qr-acoes,.adm-barra{display:none!important}
+    .qr-bloco{border:0;box-shadow:none;margin:0;padding:0}
+    .qr-caixa svg{width:70mm}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+
+<div class="adm-barra" id="adm-barra">
+  <div class="adm-barra-in">
+    <span class="adm-tag" id="adm-tag">Modo dono</span>
+    <button class="adm-b destaque" id="adm-publicar" type="button">Publicar</button>
+    <button class="adm-b" id="adm-reajuste" type="button">Reajuste</button>
+    <button class="adm-b" id="adm-sair" type="button">Sair</button>
+  </div>
+</div>
+
+<header class="capa">
+  <img class="fundo" src="data:image/webp;base64,__HERO_B64__" alt="">
+  <div class="capa-in">
+    <img class="selo" src="data:image/webp;base64,__LOGO_B64__" alt="Logotipo do Boteco do João">
+    <h1>Boteco do João</h1>
+    <p>sua casa fora de casa</p>
+    <span class="faixa">Cardápio</span>
+  </div>
+</header>
+
+<div class="balcao">
+  <div class="wrap">
+    <div class="busca-linha">
+      <label class="busca">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>
+        <input id="busca" type="search" inputmode="search" placeholder="Buscar prato, bebida ou código…" aria-label="Buscar no cardápio">
+        <button class="limpar" id="limpar" type="button" aria-label="Limpar busca">×</button>
+      </label>
+    </div>
+    <nav class="chips" id="chips" aria-label="Categorias"></nav>
+  </div>
+</div>
+
+<main class="wrap" id="conteudo"></main>
+<p class="vazio wrap" id="vazio">Nada encontrado. Tente outro nome ou o código do item.</p>
+
+<div class="wrap">
+  <section class="qr-bloco" id="qr">
+    <h2>Leve o cardápio no bolso</h2>
+    <p>Aponte a câmera do celular para o código e o cardápio abre na hora. Imprima e coloque nas mesas.</p>
+    <div class="qr-caixa" id="qr-caixa">__QR_SVG__</div>
+    <a class="qr-link" id="qr-link" href="#">__QR_URL__</a>
+    <div class="qr-acoes">
+      <button class="btn principal" id="btn-copiar-link" type="button">Copiar link</button>
+      <button class="btn fraco" id="btn-imprimir" type="button">Imprimir QR</button>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="marca">Boteco do João</div>
+  <div><a class="zap" href="https://wa.me/5571991232952" target="_blank" rel="noopener">Pedidos e reservas: (71) 99123-2952</a></div>
+  <div>Preços sujeitos a alteração. Cervejas 600&nbsp;ml: consultar valor com o garçom.</div>
+</footer>
+
+<button class="barra" id="barra" type="button" aria-label="Ver minha comanda">
+  <span class="barra-in">
+    <span class="cresce">Minha comanda · <strong id="barra-qtd">0 itens</strong></span>
+    <strong id="barra-total">R$ 0,00</strong>
+    <span class="seta">›</span>
+  </span>
+</button>
+
+<dialog class="comanda" id="dlg">
+  <div class="cab">
+    <h2>Minha comanda</h2>
+    <button class="fechar" id="fechar" type="button" aria-label="Fechar">×</button>
+  </div>
+  <ul class="pedido" id="pedido"></ul>
+  <div class="rodape-comanda">
+    <div class="total"><span>Total</span><span id="total">R$ 0,00</span></div>
+    <button class="btn principal" id="enviar" type="button">Enviar pedido pelo WhatsApp</button>
+    <button class="btn fraco" id="limpar-comanda" type="button">Limpar comanda</button>
+    <p class="aviso">Esta lista é só para você se organizar — o pedido é confirmado com o garçom.</p>
+  </div>
+</dialog>
+
+<!-- ============ painel do dono ============ -->
+<dialog class="comanda adm-dlg" id="dlg-login">
+  <div class="cab">
+    <h2>Entrar como dono</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <div class="campo">
+      <label for="adm-user">Usuário</label>
+      <input id="adm-user" autocomplete="username" autocapitalize="none" spellcheck="false">
+    </div>
+    <div class="campo">
+      <label for="adm-senha">Senha</label>
+      <input id="adm-senha" type="password" autocomplete="current-password">
+    </div>
+    <p class="erro" id="adm-erro">Usuário ou senha incorretos.</p>
+    <p class="dica">Só o dono edita o cardápio. Os clientes continuam vendo a página normal.</p>
+  </div>
+  <div class="rodape-comanda">
+    <button class="btn principal" id="adm-entrar" type="button">Entrar</button>
+  </div>
+</dialog>
+
+<dialog class="comanda adm-dlg" id="dlg-item">
+  <div class="cab">
+    <h2 id="item-titulo">Editar item</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <div class="campo">
+      <label for="f-nome">Nome do produto</label>
+      <input id="f-nome" autocapitalize="sentences">
+    </div>
+    <div class="campo">
+      <label for="f-preco">Preço (R$)</label>
+      <input id="f-preco" inputmode="decimal" placeholder="0,00">
+      <p class="dica">Vazio = aparece “consulte” no cardápio.</p>
+    </div>
+    <div class="campo">
+      <label for="f-cod">Código do sistema</label>
+      <input id="f-cod" inputmode="numeric" placeholder="opcional">
+    </div>
+    <div class="campo">
+      <label for="f-desc">Descrição</label>
+      <textarea id="f-desc" placeholder="opcional — aparece embaixo do nome"></textarea>
+    </div>
+    <div class="campo">
+      <label for="f-secao">Seção</label>
+      <select id="f-secao"></select>
+    </div>
+    <p class="erro" id="item-erro"></p>
+  </div>
+  <div class="rodape-comanda">
+    <button class="btn principal" id="item-salvar" type="button">Salvar</button>
+    <div class="linha-btn" id="item-mover">
+      <button class="btn fraco" id="item-sobe" type="button">↑ Subir</button>
+      <button class="btn fraco" id="item-desce" type="button">↓ Descer</button>
+    </div>
+    <button class="btn perigo" id="item-apagar" type="button">Apagar item</button>
+  </div>
+</dialog>
+
+<dialog class="comanda adm-dlg" id="dlg-secao">
+  <div class="cab">
+    <h2 id="secao-titulo">Editar seção</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <div class="campo">
+      <label for="f-secnome">Nome da seção</label>
+      <input id="f-secnome" autocapitalize="words">
+    </div>
+    <div class="campo">
+      <label for="f-secnota">Observação</label>
+      <input id="f-secnota" placeholder="opcional — ex.: “consultar o garçom”">
+    </div>
+    <p class="erro" id="secao-erro"></p>
+  </div>
+  <div class="rodape-comanda">
+    <button class="btn principal" id="secao-salvar" type="button">Salvar</button>
+    <div class="linha-btn" id="secao-mover">
+      <button class="btn fraco" id="secao-sobe" type="button">↑ Subir</button>
+      <button class="btn fraco" id="secao-desce" type="button">↓ Descer</button>
+    </div>
+    <button class="btn perigo" id="secao-apagar" type="button">Apagar seção inteira</button>
+  </div>
+</dialog>
+
+<dialog class="comanda adm-dlg" id="dlg-reajuste">
+  <div class="cab">
+    <h2>Reajuste de preços</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <div class="campo">
+      <label for="f-pct">Variação (%)</label>
+      <input id="f-pct" inputmode="decimal" placeholder="ex.: 10 para subir, -5 para baixar">
+    </div>
+    <div class="campo">
+      <label for="f-escopo">Onde aplicar</label>
+      <select id="f-escopo"></select>
+    </div>
+    <div class="campo">
+      <label for="f-arred">Arredondar para</label>
+      <select id="f-arred">
+        <option value="99">terminar em ,99</option>
+        <option value="01">centavos exatos</option>
+        <option value="50">meio real</option>
+        <option value="00">real inteiro</option>
+      </select>
+    </div>
+    <p class="erro" id="reaj-erro"></p>
+    <p class="dica">Itens marcados como “consulte” não são alterados.</p>
+  </div>
+  <div class="rodape-comanda">
+    <button class="btn principal" id="reaj-aplicar" type="button">Aplicar reajuste</button>
+  </div>
+</dialog>
+
+<dialog class="comanda adm-dlg" id="dlg-publicar">
+  <div class="cab">
+    <h2>Publicar alterações</h2>
+    <button class="fechar" data-fecha type="button" aria-label="Fechar">×</button>
+  </div>
+  <div class="campos">
+    <p class="dica" id="pub-resumo"></p>
+    <div class="linha-btn">
+      <button class="btn principal" id="pub-copiar" type="button">Copiar dados</button>
+      <button class="btn fraco" id="pub-baixar" type="button">Baixar arquivo</button>
+    </div>
+    <textarea class="saida" id="pub-json" readonly aria-label="Dados do cardápio"></textarea>
+    <p class="dica">Copie (ou baixe) e mande no WhatsApp para republicar a página. O link e o QR das mesas continuam os mesmos.</p>
+  </div>
+  <div class="rodape-comanda">
+    <button class="btn fraco" id="pub-restaurar" type="button">Descartar e voltar ao cardápio publicado</button>
+  </div>
+</dialog>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO — mexa só aqui
+   ============================================================ */
+const CONFIG = {
+  whatsapp: "5571991232952", // país + DDD + número, só dígitos
+  nome: "Boteco do João",
+  versao: "__VERSAO__",      // trocado pelo build.py a cada publicação
+  // SHA-256 de "bdj|usuário|senha" — a senha em si não fica na página
+  dono: "c0b3d47dfe57679d05dd3a649af05c903ca4b99a2963e742969f25c0b54b4505"
+};
+
+const CARDAPIO_PADRAO = [
+ {id:"chapas", nome:"Refeições na Chapa", destaque:true, itens:[
+   {cod:"", nome:"Chapa de Carne do Sol", preco:89.99, desc:"Carne do sol acebolada, servida na chapa, com lâminas de queijo coalho maçaricado. Acompanha arroz branco, feijão tropeiro, vinagrete e farofa."},
+   {cod:"", nome:"Chapa de Cupim", preco:99.99, desc:"Cupim maturado acebolado, servido na chapa, com lâminas de queijo coalho maçaricado. Acompanha arroz branco, feijão tropeiro, vinagrete e farofa."},
+   {cod:"", nome:"Chapa de Picanha Argentina", preco:109.99, desc:"Picanha argentina acebolada, servida na chapa, com lâminas de queijo coalho maçaricado. Acompanha arroz branco, feijão tropeiro, vinagrete e farofa."},
+   {cod:"", nome:"Chapa Mista do João", preco:119.99, desc:"Carne do sol, cupim e fumeiro acebolados, servidos na chapa, com lâminas de queijo coalho maçaricado. Acompanha arroz branco, feijão tropeiro, vinagrete e farofa."}
+ ]},
+ {id:"petiscar", nome:"Para Petiscar", itens:[
+   {cod:"002", nome:"Arrumadinho", preco:54.99},
+   {cod:"053", nome:"Carne do Sol c/ Fritas", preco:53.99},
+   {cod:"022", nome:"Carne do Sol c/ Aipim Frito", preco:52.99},
+   {cod:"116", nome:"Carne do Sol c/ Farofa e Salada", preco:39.99},
+   {cod:"056", nome:"Calabresa c/ Fritas", preco:44.99},
+   {cod:"117", nome:"Calabresa c/ Aipim Frito", preco:38.99},
+   {cod:"075", nome:"Fumeiro c/ Fritas", preco:54.99},
+   {cod:"076", nome:"Fumeiro c/ Farofa e Vinagrete", preco:39.99},
+   {cod:"118", nome:"Fumeiro c/ Aipim Frito", preco:52.99},
+   {cod:"146", nome:"Filé c/ Farofa e Vinagrete", preco:34.99},
+   {cod:"119", nome:"Filé c/ Fritas", preco:52.99},
+   {cod:"120", nome:"Filé c/ Aipim Frito", preco:49.99},
+   {cod:"041", nome:"Escondidinho de Carne do Sol", preco:54.99},
+   {cod:"533", nome:"Escondidinho de Calabresa", preco:51.99},
+   {cod:"883", nome:"Escondidinho de Fumeiro", preco:53.99},
+   {cod:"885", nome:"Escondidinho Misto", preco:54.99},
+   {cod:"133", nome:"Cupim c/ Farofa e Vinagrete", preco:38.99},
+   {cod:"057", nome:"Cupim c/ Fritas", preco:55.99},
+   {cod:"796", nome:"Cupim c/ Aipim Frito", preco:52.99},
+   {cod:"145", nome:"Queijo Coalho c/ Filé", preco:48.99},
+   {cod:"065", nome:"Queijo Coalho c/ Carne do Sol", preco:55.99},
+   {cod:"123", nome:"Queijo Coalho c/ Fumeiro", preco:56.99},
+   {cod:"173", nome:"Queijo Coalho c/ Cupim", preco:54.99},
+   {cod:"884", nome:"Queijo Coalho c/ Costela", preco:55.99},
+   {cod:"000", nome:"Picanha Argentina à moda da casa", preco:94.99}
+ ]},
+ {id:"degustar", nome:"Para Degustar", itens:[
+   {cod:"060", nome:"Agulhinha Frita", preco:29.99},
+   {cod:"068", nome:"Carne do Sol c/ Pão de Alho", preco:32.99},
+   {cod:"631", nome:"Tripa Frita", preco:38.00},
+   {cod:"063", nome:"Queijo Coalho", preco:24.00},
+   {cod:"931", nome:"Codorna (1 unid.)", preco:17.00},
+   {cod:"351", nome:"Camarão c/ Queijo Coalho", preco:56.99},
+   {cod:"351", nome:"Camarão Alho e Óleo", preco:43.99}
+ ]},
+ {id:"mar", nome:"Frutos do Mar", itens:[
+   {cod:"066", nome:"Escondidinho de Camarão", preco:58.99},
+   {cod:"121", nome:"Isca de Peixe c/ Fritas", preco:52.99},
+   {cod:"064", nome:"Isca de Peixe c/ Farofa e Vinagrete", preco:46.99},
+   {cod:"052", nome:"Pititinga c/ Farofa e Vinagrete", preco:36.99},
+   {cod:"073", nome:"Pititinga c/ Fritas", preco:45.99},
+   {cod:"024", nome:"Peixe Vermelho Frito", preco:89.99},
+   {cod:"000", nome:"Lambreta", preco:38.99}
+ ]},
+ {id:"aves", nome:"Aves", itens:[
+   {cod:"074", nome:"Frango a Passarinha c/ Fritas", preco:46.99},
+   {cod:"058", nome:"Frango a Passarinha c/ Farofa e Vinagrete", preco:42.99},
+   {cod:"122", nome:"Frango a Passarinha c/ Aipim Frito", preco:44.99},
+   {cod:"862", nome:"Isca de Frango c/ Fritas", preco:48.99},
+   {cod:"849", nome:"Isca de Frango c/ Farofa e Vinagrete", preco:43.99}
+ ]},
+ {id:"espetinhos", nome:"Espetinhos", itens:[
+   {cod:"015", nome:"Pão de Alho", preco:8.00},
+   {cod:"013", nome:"Bisteca", preco:14.00},
+   {cod:"012", nome:"Coração", preco:12.00},
+   {cod:"006", nome:"Misto", preco:14.00},
+   {cod:"009", nome:"Filé", preco:15.00},
+   {cod:"027", nome:"Frango com Calabresa", preco:14.00},
+   {cod:"014", nome:"Frango", preco:14.00},
+   {cod:"028", nome:"Calabresa", preco:14.00},
+   {cod:"029", nome:"Carne com Calabresa", preco:14.00},
+   {cod:"008", nome:"Filé c/ Bacon", preco:16.00},
+   {cod:"011", nome:"Asinha de Frango", preco:16.00},
+   {cod:"003", nome:"Cupim", preco:17.00},
+   {cod:"007", nome:"Coxinha da Asa", preco:16.00},
+   {cod:"031", nome:"Peito Aberto", preco:26.00},
+   {cod:"069", nome:"Javali", preco:30.00},
+   {cod:"070", nome:"Costela", preco:28.00},
+   {cod:"000", nome:"Espetinho de Alcatra", preco:15.00},
+   {cod:"000", nome:"Espetinho de Picanha", preco:17.00}
+ ]},
+ {id:"bol-gourmet", nome:"Bolinhos Gourmet", itens:[
+   {cod:"201", nome:"Bolinho de Queijo", preco:22.99},
+   {cod:"202", nome:"Bolinho de Frango", preco:22.99},
+   {cod:"203", nome:"Bolinho de Calabresa", preco:22.99},
+   {cod:"204", nome:"Bolinho de Toscana Apimentada", preco:22.99},
+   {cod:"205", nome:"Bolinho Misto", preco:22.99}
+ ]},
+ {id:"bol-premium", nome:"Bolinhos Premium", itens:[
+   {cod:"211", nome:"Bolinho de Filé ao Molho Gorgonzola", preco:25.99},
+   {cod:"212", nome:"Bolinho de Costela Suína c/ Barbecue", preco:25.99},
+   {cod:"213", nome:"Bolinho de Charque c/ Coalho", preco:25.99},
+   {cod:"215", nome:"Bolinho Sertanejo (carne seca c/ banana)", preco:25.99}
+ ]},
+ {id:"bol-casa", nome:"Bolinhos da Casa", itens:[
+   {cod:"208", nome:"Bolinho de Quatro Queijos", preco:23.99},
+   {cod:"210", nome:"Bolinho de Cupim ao Molho", preco:23.99}
+ ]},
+ {id:"bol-especiais", nome:"Bolinhos Especiais", itens:[
+   {cod:"217", nome:"Croquete de Bacalhau", preco:28.99},
+   {cod:"218", nome:"Bolinho de Camarão", preco:28.99},
+   {cod:"220", nome:"Camarão Encapotado", preco:36.99}
+ ]},
+ {id:"kibes", nome:"Kibes", itens:[
+   {cod:"206", nome:"Kibe c/ Carne", preco:24.99},
+   {cod:"207", nome:"Kibe c/ Queijo", preco:24.99}
+ ]},
+ {id:"caldos", nome:"Caldos", itens:[
+   {cod:"054", nome:"Caldo de Sururu", preco:17.99},
+   {cod:"125", nome:"Caldo de Quenga", preco:17.99},
+   {cod:"055", nome:"Caldo de Xereca", preco:16.99}
+ ]},
+ {id:"cozido", nome:"Cozido da Ieda", nota:"Servido aos sábados", itens:[
+   {cod:"190", nome:"Cozido Individual", preco:35.00},
+   {cod:"189", nome:"Cozido Executivo", preco:65.00}
+ ]},
+ {id:"feijoada", nome:"Feijoada da Ieda", nota:"Servida aos domingos", itens:[
+   {cod:"112", nome:"Feijoada Individual", preco:35.00},
+   {cod:"113", nome:"Feijoada Executiva", preco:65.00}
+ ]},
+ {id:"guarnicoes", nome:"Guarnições", itens:[
+   {cod:"021", nome:"Batata Frita", preco:25.00},
+   {cod:"071", nome:"Aipim Frito", preco:19.00},
+   {cod:"077", nome:"Feijão Tropeiro", preco:9.00},
+   {cod:"078", nome:"Vinagrete", preco:7.00},
+   {cod:"079", nome:"Farofa", preco:7.00},
+   {cod:"350", nome:"Arroz", preco:7.00}
+ ]},
+ {id:"cervejas", nome:"Cervejas 600 ml", nota:"Consultar preço com o garçom", itens:[
+   {cod:"001", nome:"Skol", preco:null},
+   {cod:"091", nome:"Itaipava", preco:null},
+   {cod:"005", nome:"Devassa", preco:null},
+   {cod:"084", nome:"Petra", preco:null},
+   {cod:"082", nome:"Eisenbahn", preco:null},
+   {cod:"230", nome:"Budweiser", preco:null},
+   {cod:"083", nome:"Itaipava Premium", preco:null},
+   {cod:"111", nome:"Brahma Duplo Malte", preco:null},
+   {cod:"016", nome:"Heineken", preco:null},
+   {cod:"224", nome:"Império Puro Malte", preco:null},
+   {cod:"444", nome:"Stella Artois", preco:null},
+   {cod:"235", nome:"Spaten", preco:null},
+   {cod:"149", nome:"Original", preco:null},
+   {cod:"232", nome:"Amstel", preco:null},
+   {cod:"448", nome:"Brahma Chopp", preco:null}
+ ]},
+ {id:"bebidas", nome:"Bebidas", itens:[
+   {cod:"017", nome:"Heineken Long Neck", preco:null},
+   {cod:"159", nome:"Budweiser Long Neck", preco:null},
+   {cod:"161", nome:"Corona Long Neck", preco:null},
+   {cod:"034", nome:"Cerveja em Lata", preco:null},
+   {cod:"088", nome:"Skol Beats", preco:9.00},
+   {cod:"040", nome:"Smirnoff Ice", preco:12.00},
+   {cod:"032", nome:"Malzebier", preco:9.00}
+ ]},
+ {id:"sem-alcool", nome:"Bebidas s/ Álcool", itens:[
+   {cod:"049", nome:"Cerveja s/ Álcool", preco:8.00},
+   {cod:"231", nome:"Heineken s/ Álcool", preco:10.00},
+   {cod:"018", nome:"Refrigerante Lata", preco:6.00},
+   {cod:"023", nome:"Refrigerante Litro", preco:9.00},
+   {cod:"964", nome:"Coca-Cola KS", preco:7.00},
+   {cod:"024", nome:"H2O", preco:8.00},
+   {cod:"035", nome:"Água s/ Gás", preco:4.00},
+   {cod:"036", nome:"Água c/ Gás", preco:5.00},
+   {cod:"081", nome:"Água Tônica", preco:7.00},
+   {cod:"148", nome:"Água de Coco", preco:7.00},
+   {cod:"050", nome:"Energético Red Bull", preco:12.00},
+   {cod:"051", nome:"Energético TNT", preco:10.00},
+   {cod:"052", nome:"Energético Monster", preco:10.00},
+   {cod:"067", nome:"Energético Energyup", preco:8.00}
+ ]},
+ {id:"sucos", nome:"Suco de Frutas", itens:[
+   {cod:"037", nome:"Suco de Maracujá", preco:15.00},
+   {cod:"038", nome:"Suco de Laranja", preco:15.00},
+   {cod:"039", nome:"Suco de Abacaxi", preco:15.00},
+   {cod:"085", nome:"Suco de Morango", preco:18.00},
+   {cod:"086", nome:"Suco de Limão", preco:14.00},
+   {cod:"934", nome:"Suco de Frutas da Época", preco:15.00}
+ ]},
+ {id:"drinks", nome:"Drinks", itens:[
+   {cod:"019", nome:"Roska", preco:16.99},
+   {cod:"087", nome:"Coquetel de Frutas Vermelhas", preco:18.99},
+   {cod:"899", nome:"Coquetel de Frutas Tropicais", preco:18.99},
+   {cod:"853", nome:"Morito", preco:19.99},
+   {cod:"856", nome:"Gin Tônica", preco:19.99},
+   {cod:"855", nome:"Aperol Spritz", preco:19.99},
+   {cod:"854", nome:"Piña Colada", preco:17.99},
+   {cod:"851", nome:"Strawberry Ice Rose", preco:26.99}
+ ]},
+ {id:"whisky", nome:"Whisky (dose)", itens:[
+   {cod:"061", nome:"Red Label", preco:13.00},
+   {cod:"988", nome:"Ballantine's", preco:12.00},
+   {cod:"110", nome:"Old Parr", preco:15.00},
+   {cod:"103", nome:"Jack Daniel's", preco:15.00},
+   {cod:"094", nome:"Chivas Regal", preco:15.00},
+   {cod:"999", nome:"Black Label", preco:15.00}
+ ]},
+ {id:"destilados", nome:"Destilados", itens:[
+   {cod:"020", nome:"Alcatrão", preco:9.00},
+   {cod:"026", nome:"Cabaré", preco:8.00},
+   {cod:"030", nome:"Jatobá", preco:7.00},
+   {cod:"043", nome:"Licor", preco:28.00},
+   {cod:"044", nome:"Pitu", preco:3.00},
+   {cod:"967", nome:"Salinas", preco:5.00},
+   {cod:"045", nome:"Genebra", preco:5.00},
+   {cod:"046", nome:"Domecq", preco:8.00},
+   {cod:"047", nome:"Campari", preco:12.00},
+   {cod:"048", nome:"Vodka Orloff", preco:8.00},
+   {cod:"089", nome:"Seleta", preco:10.00},
+   {cod:"090", nome:"Martini", preco:8.00},
+   {cod:"092", nome:"Conhaque", preco:7.00},
+   {cod:"093", nome:"Abaíra", preco:8.00},
+   {cod:"857", nome:"Aperol", preco:10.00},
+   {cod:"859", nome:"Tequila", preco:15.00},
+   {cod:"096", nome:"Bacardi", preco:8.00},
+   {cod:"097", nome:"Ypióca", preco:8.00},
+   {cod:"098", nome:"Cachaça 51", preco:8.00},
+   {cod:"099", nome:"Vodka Smirnoff", preco:8.00},
+   {cod:"100", nome:"Vodka Skyy", preco:10.00},
+   {cod:"101", nome:"Vodka Absolut", preco:15.00},
+   {cod:"104", nome:"Cortezano", preco:7.00},
+   {cod:"107", nome:"Sagatiba", preco:8.00},
+   {cod:"108", nome:"Amarula", preco:15.00},
+   {cod:"109", nome:"Montilla", preco:8.00},
+   {cod:"114", nome:"Velho Barreiro", preco:8.00},
+   {cod:"042", nome:"Vinho (taça)", preco:12.00},
+   {cod:"043", nome:"Vinho (garrafa)", preco:38.00}
+ ]}
+];
+
+/* ============================================================
+   Cardápio vivo: o dono edita e fica guardado NESTE aparelho.
+   Quando uma versão nova é publicada, a cópia local é descartada
+   (a publicação sempre manda mais que o rascunho do celular).
+   ============================================================ */
+const CHAVE_DADOS = "boteco-do-joao/cardapio";
+const CHAVE_DONO  = "boteco-do-joao/dono";
+const clonar = d => JSON.parse(JSON.stringify(d));
+
+function carregarCardapio(){
+  try{
+    const bruto = localStorage.getItem(CHAVE_DADOS);
+    if (bruto){
+      const g = JSON.parse(bruto);
+      if (g && g.versao === CONFIG.versao && Array.isArray(g.dados) && g.dados.length) return g.dados;
+      localStorage.removeItem(CHAVE_DADOS);
+    }
+  }catch(e){}
+  return clonar(CARDAPIO_PADRAO);
+}
+
+let CARDAPIO = carregarCardapio();
+let admin = false;
+
+function guardar(){
+  try{
+    localStorage.setItem(CHAVE_DADOS, JSON.stringify({versao:CONFIG.versao, dados:CARDAPIO}));
+    return true;
+  }catch(e){
+    avisar("Não deu para salvar neste aparelho!");
+    return false;
+  }
+}
+const temAlteracao = () => JSON.stringify(CARDAPIO) !== JSON.stringify(CARDAPIO_PADRAO);
+
+/* ============================================================ */
+const real = n => n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const semAcento = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+
+const elConteudo = document.getElementById("conteudo");
+const elChips = document.getElementById("chips");
+const elVazio = document.getElementById("vazio");
+const elBusca = document.getElementById("busca");
+const elLimpar = document.getElementById("limpar");
+
+/* --- monta as seções (roda de novo a cada edição do dono) --- */
+let observador = null;
+
+function botaoAdm(texto, forte, acao){
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "adm-s" + (forte ? " forte" : "");
+  b.textContent = texto;
+  b.addEventListener("click", acao);
+  return b;
+}
+
+function montar(){
+  elConteudo.textContent = "";
+  elChips.textContent = "";
+  if (observador) observador.disconnect();
+
+  CARDAPIO.forEach((sec, si) => {
+    const s = document.createElement("section");
+    s.className = "secao";
+    s.id = "s-" + si;
+
+    const topo = document.createElement("div");
+    topo.className = "secao-topo";
+    const h = document.createElement("h2");
+    h.textContent = sec.nome;
+    const regua = document.createElement("span");
+    regua.className = "secao-regua";
+    topo.append(h, regua);
+    s.append(topo);
+
+    if (sec.nota){
+      const n = document.createElement("p");
+      n.className = "nota";
+      n.textContent = sec.nota;
+      s.append(n);
+    }
+
+    const barraSec = document.createElement("div");
+    barraSec.className = "adm-sec";
+    barraSec.append(
+      botaoAdm("+ Novo produto aqui", true, () => abrirItem(si, -1)),
+      botaoAdm("Editar seção", false, () => abrirSecao(si))
+    );
+    s.append(barraSec);
+
+    const lista = document.createElement("div");
+    lista.className = "lista";
+    sec.itens.forEach((it, ii) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "item" + (sec.destaque ? " grande" : "");
+      b.dataset.busca = semAcento(it.nome + " " + sec.nome + " " + (it.cod || ""));
+      b.dataset.chave = si + "-" + ii;
+      b.setAttribute("aria-label", (admin ? "Editar " : "Adicionar ") + it.nome +
+        (admin ? "" : " à comanda"));
+
+      if (it.cod){
+        const c = document.createElement("span");
+        c.className = "cod";
+        c.textContent = it.cod;
+        b.append(c);
+      }
+      const nm = document.createElement("span");
+      nm.className = "nome";
+      nm.textContent = it.nome;
+      const pt = document.createElement("span");
+      pt.className = "pontos";
+      const pr = document.createElement("span");
+      pr.className = "preco" + (it.preco == null ? " consulte" : "");
+      pr.textContent = it.preco == null ? "consulte" : real(it.preco);
+      const mais = document.createElement("span");
+      mais.className = "mais";
+      mais.textContent = admin ? "✎" : "+";
+      mais.setAttribute("aria-hidden", "true");
+      b.append(nm, pt, pr, mais);
+
+      if (it.desc){
+        const d = document.createElement("span");
+        d.className = "desc";
+        d.textContent = it.desc;
+        b.append(d);
+      }
+      b.addEventListener("click", () => admin ? abrirItem(si, ii) : adicionar(si, ii));
+      lista.append(b);
+    });
+    s.append(lista);
+    elConteudo.append(s);
+
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.textContent = sec.nome;
+    chip.dataset.alvo = s.id;
+    chip.addEventListener("click", () => {
+      s.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    elChips.append(chip);
+  });
+
+  const rodapeAdm = document.createElement("div");
+  rodapeAdm.className = "adm-sec";
+  rodapeAdm.style.marginBottom = "24px";
+  rodapeAdm.append(botaoAdm("+ Nova seção do cardápio", true, () => abrirSecao(-1)));
+  elConteudo.append(rodapeAdm);
+
+  /* --- chip ativo conforme rolagem --- */
+  observador = new IntersectionObserver(entradas => {
+    entradas.forEach(e => {
+      if (!e.isIntersecting) return;
+      elChips.querySelectorAll(".chip").forEach(c =>
+        c.classList.toggle("ativo", c.dataset.alvo === e.target.id));
+      const at = elChips.querySelector(".chip.ativo");
+      if (at) at.scrollIntoView({behavior:"smooth", block:"nearest", inline:"center"});
+    });
+  }, {rootMargin:"-130px 0px -70% 0px", threshold:0});
+  document.querySelectorAll(".secao").forEach(s => observador.observe(s));
+
+  filtrar();
+}
+
+/* --- busca --- */
+function filtrar(){
+  const q = semAcento(elBusca.value.trim());
+  elLimpar.classList.toggle("on", q.length > 0);
+  let achou = 0;
+  document.querySelectorAll(".secao").forEach(sec => {
+    let visiveis = 0;
+    sec.querySelectorAll(".item").forEach(it => {
+      const ok = !q || it.dataset.busca.includes(q);
+      it.style.display = ok ? "" : "none";
+      if (ok) visiveis++;
+    });
+    sec.style.display = visiveis ? "" : "none";
+    achou += visiveis;
+  });
+  elVazio.classList.toggle("on", achou === 0);
+}
+elBusca.addEventListener("input", filtrar);
+elLimpar.addEventListener("click", () => { elBusca.value = ""; filtrar(); elBusca.focus(); });
+
+/* --- comanda --- */
+const comanda = new Map();
+const elBarra = document.getElementById("barra");
+const elBarraQtd = document.getElementById("barra-qtd");
+const elBarraTotal = document.getElementById("barra-total");
+const elPedido = document.getElementById("pedido");
+const elTotal = document.getElementById("total");
+const dlg = document.getElementById("dlg");
+
+function item(si, ii){ return CARDAPIO[si].itens[ii]; }
+
+function adicionar(si, ii){
+  const k = si + "-" + ii;
+  comanda.set(k, (comanda.get(k) || 0) + 1);
+  atualizar();
+}
+
+function atualizar(){
+  let qtd = 0, total = 0;
+  comanda.forEach((n, k) => {
+    const [si, ii] = k.split("-").map(Number);
+    qtd += n;
+    total += (item(si, ii).preco || 0) * n;
+  });
+  elBarra.classList.toggle("on", qtd > 0);
+  elBarraQtd.textContent = qtd + (qtd === 1 ? " item" : " itens");
+  elBarraTotal.textContent = real(total);
+  elTotal.textContent = real(total);
+
+  elPedido.textContent = "";
+  comanda.forEach((n, k) => {
+    const [si, ii] = k.split("-").map(Number);
+    const it = item(si, ii);
+    const li = document.createElement("li");
+
+    const nome = document.createElement("div");
+    nome.className = "p-nome";
+    nome.textContent = it.nome;
+    if (it.cod){
+      const c = document.createElement("div");
+      c.className = "p-cod";
+      c.textContent = "código " + it.cod;
+      nome.append(c);
+    }
+
+    const qtdBox = document.createElement("div");
+    qtdBox.className = "qtd";
+    const menos = document.createElement("b");
+    menos.textContent = "−";
+    menos.tabIndex = 0;
+    menos.setAttribute("role","button");
+    menos.setAttribute("aria-label","Tirar um " + it.nome);
+    const conta = document.createElement("span");
+    conta.textContent = n;
+    const mais = document.createElement("b");
+    mais.textContent = "+";
+    mais.tabIndex = 0;
+    mais.setAttribute("role","button");
+    mais.setAttribute("aria-label","Mais um " + it.nome);
+    menos.addEventListener("click", () => {
+      const v = comanda.get(k) - 1;
+      if (v <= 0) comanda.delete(k); else comanda.set(k, v);
+      atualizar();
+      if (comanda.size === 0 && dlg.open) dlg.close();
+    });
+    mais.addEventListener("click", () => { comanda.set(k, comanda.get(k) + 1); atualizar(); });
+    qtdBox.append(menos, conta, mais);
+
+    const preco = document.createElement("div");
+    preco.className = "p-preco";
+    preco.textContent = it.preco == null ? "consulte" : real(it.preco * n);
+
+    li.append(nome, qtdBox, preco);
+    elPedido.append(li);
+  });
+}
+
+elBarra.addEventListener("click", () => dlg.showModal());
+document.getElementById("fechar").addEventListener("click", () => dlg.close());
+document.getElementById("limpar-comanda").addEventListener("click", () => {
+  comanda.clear(); atualizar(); dlg.close();
+});
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+
+function textoPedido(){
+  const linhas = ["*Pedido — " + CONFIG.nome + "*", ""];
+  let total = 0;
+  comanda.forEach((n, k) => {
+    const [si, ii] = k.split("-").map(Number);
+    const it = item(si, ii);
+    total += (it.preco || 0) * n;
+    linhas.push(n + "x " + (it.cod ? "(" + it.cod + ") " : "") + it.nome +
+      (it.preco == null ? " — a consultar" : " — " + real(it.preco * n)));
+  });
+  linhas.push("", "Total: " + real(total));
+  return linhas.join("\n");
+}
+
+const btnEnviar = document.getElementById("enviar");
+if (!CONFIG.whatsapp) btnEnviar.textContent = "Copiar pedido";
+btnEnviar.addEventListener("click", async () => {
+  const txt = textoPedido();
+  if (CONFIG.whatsapp){
+    window.open("https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(txt), "_blank", "noopener");
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(txt);
+    btnEnviar.textContent = "Pedido copiado!";
+    setTimeout(() => btnEnviar.textContent = "Copiar pedido", 1800);
+  }catch(e){
+    btnEnviar.textContent = "Não deu para copiar";
+    setTimeout(() => btnEnviar.textContent = "Copiar pedido", 1800);
+  }
+});
+
+/* --- QR / link --- */
+const btnCopiarLink = document.getElementById("btn-copiar-link");
+const elQrLink = document.getElementById("qr-link");
+const enderecoPagina = elQrLink.textContent.trim().startsWith("http")
+  ? elQrLink.textContent.trim()
+  : location.href.split("#")[0];
+elQrLink.textContent = enderecoPagina;
+elQrLink.href = enderecoPagina;
+btnCopiarLink.addEventListener("click", async () => {
+  try{
+    await navigator.clipboard.writeText(enderecoPagina);
+    btnCopiarLink.textContent = "Link copiado!";
+  }catch(e){
+    btnCopiarLink.textContent = "Copie da barra do navegador";
+  }
+  setTimeout(() => btnCopiarLink.textContent = "Copiar link", 1800);
+});
+document.getElementById("btn-imprimir").addEventListener("click", () => window.print());
+
+/* ============================================================
+   PAINEL DO DONO — login, edição de itens/seções, publicação
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const dlgLogin = $("dlg-login"), dlgItem = $("dlg-item"), dlgSecao = $("dlg-secao"),
+      dlgReaj = $("dlg-reajuste"), dlgPub = $("dlg-publicar");
+
+document.querySelectorAll("[data-fecha]").forEach(b =>
+  b.addEventListener("click", () => b.closest("dialog").close()));
+document.querySelectorAll(".adm-dlg").forEach(d =>
+  d.addEventListener("click", e => { if (e.target === d) d.close(); }));
+
+let avisoTimer = null;
+function avisar(txt){
+  const tag = $("adm-tag");
+  clearTimeout(avisoTimer);
+  tag.textContent = txt;
+  avisoTimer = setTimeout(() => tag.textContent = "Modo dono", 2600);
+}
+
+/* --- confirmação em dois toques, sem depender de confirm() --- */
+function doisToques(btn, acao){
+  const original = btn.dataset.rotulo || (btn.dataset.rotulo = btn.textContent);
+  if (btn.dataset.armado){
+    delete btn.dataset.armado;
+    btn.textContent = original;
+    acao();
+    return;
+  }
+  btn.dataset.armado = "1";
+  btn.textContent = "Tem certeza? Toque de novo";
+  setTimeout(() => {
+    if (btn.dataset.armado){ delete btn.dataset.armado; btn.textContent = original; }
+  }, 4000);
+}
+function desarmar(btn){
+  if (btn.dataset.rotulo){ delete btn.dataset.armado; btn.textContent = btn.dataset.rotulo; }
+}
+
+/* --- preço: aceita "12,50", "12.50", "R$ 1.234,56" --- */
+function precoTexto(v){ return v == null ? "" : v.toFixed(2).replace(".", ","); }
+function lerPreco(txt){
+  const bruto = String(txt).trim();
+  if (!bruto) return null;                               // null = "consulte"
+  if (!/\d/.test(bruto)) return undefined;               // escreveu algo sem número
+  const t = bruto.replace(/[^\d,.\-]/g, "");
+  const n = parseFloat(t.replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", "."));
+  return (isFinite(n) && n >= 0) ? Math.round(n * 100) / 100 : undefined; // undefined = inválido
+}
+
+function aplicouMudanca(){
+  guardar();
+  comanda.clear();
+  montar();
+  atualizar();
+}
+
+/* ---------------- itens ---------------- */
+let edItem = {si:0, ii:-1};
+
+function abrirItem(si, ii){
+  edItem = {si, ii};
+  const novo = ii < 0;
+  const it = novo ? {cod:"", nome:"", preco:null, desc:""} : CARDAPIO[si].itens[ii];
+  $("item-titulo").textContent = novo ? "Novo produto" : "Editar produto";
+  $("f-nome").value = it.nome || "";
+  $("f-preco").value = precoTexto(it.preco == null ? null : it.preco);
+  $("f-cod").value = it.cod || "";
+  $("f-desc").value = it.desc || "";
+
+  const sel = $("f-secao");
+  sel.textContent = "";
+  CARDAPIO.forEach((s, i) => {
+    const o = document.createElement("option");
+    o.value = i; o.textContent = s.nome;
+    sel.append(o);
+  });
+  sel.value = si;
+
+  $("item-erro").classList.remove("on");
+  $("item-mover").style.display = novo ? "none" : "";
+  $("item-apagar").style.display = novo ? "none" : "";
+  desarmar($("item-apagar"));
+  dlgItem.showModal();
+  if (novo) $("f-nome").focus();
+}
+
+$("item-salvar").addEventListener("click", () => {
+  const nome = $("f-nome").value.trim();
+  const erro = $("item-erro");
+  if (!nome){
+    erro.textContent = "Escreva o nome do produto.";
+    erro.classList.add("on");
+    return;
+  }
+  const preco = lerPreco($("f-preco").value);
+  if (preco === undefined){
+    erro.textContent = "Preço inválido. Use por exemplo 45,90 — ou deixe vazio.";
+    erro.classList.add("on");
+    return;
+  }
+  erro.classList.remove("on");
+
+  const novo = {cod: $("f-cod").value.trim(), nome, preco};
+  const desc = $("f-desc").value.trim();
+  if (desc) novo.desc = desc;
+
+  const destino = Number($("f-secao").value);
+  if (edItem.ii < 0){
+    CARDAPIO[destino].itens.push(novo);
+  } else if (destino === edItem.si){
+    CARDAPIO[edItem.si].itens[edItem.ii] = novo;
+  } else {
+    CARDAPIO[edItem.si].itens.splice(edItem.ii, 1);
+    CARDAPIO[destino].itens.push(novo);
+  }
+  dlgItem.close();
+  aplicouMudanca();
+  avisar(edItem.ii < 0 ? "Produto adicionado" : "Produto salvo");
+});
+
+function moverItem(passo){
+  const {si, ii} = edItem;
+  const lista = CARDAPIO[si].itens;
+  const alvo = ii + passo;
+  if (alvo < 0 || alvo >= lista.length) return;
+  [lista[ii], lista[alvo]] = [lista[alvo], lista[ii]];
+  edItem.ii = alvo;
+  guardar();
+  montar();
+  avisar("Item movido");
+}
+$("item-sobe").addEventListener("click", () => moverItem(-1));
+$("item-desce").addEventListener("click", () => moverItem(1));
+
+$("item-apagar").addEventListener("click", e => doisToques(e.currentTarget, () => {
+  CARDAPIO[edItem.si].itens.splice(edItem.ii, 1);
+  dlgItem.close();
+  aplicouMudanca();
+  avisar("Produto apagado");
+}));
+
+/* ---------------- seções ---------------- */
+let edSecao = -1;
+
+function abrirSecao(si){
+  edSecao = si;
+  const nova = si < 0;
+  const sec = nova ? {nome:"", nota:""} : CARDAPIO[si];
+  $("secao-titulo").textContent = nova ? "Nova seção" : "Editar seção";
+  $("f-secnome").value = sec.nome || "";
+  $("f-secnota").value = sec.nota || "";
+  $("secao-erro").classList.remove("on");
+  $("secao-mover").style.display = nova ? "none" : "";
+  $("secao-apagar").style.display = nova ? "none" : "";
+  desarmar($("secao-apagar"));
+  dlgSecao.showModal();
+  if (nova) $("f-secnome").focus();
+}
+
+$("secao-salvar").addEventListener("click", () => {
+  const nome = $("f-secnome").value.trim();
+  const erro = $("secao-erro");
+  if (!nome){
+    erro.textContent = "Escreva o nome da seção.";
+    erro.classList.add("on");
+    return;
+  }
+  erro.classList.remove("on");
+  const nota = $("f-secnota").value.trim();
+
+  if (edSecao < 0){
+    CARDAPIO.push({id:"s" + CARDAPIO.length, nome, nota, itens:[]});
+  } else {
+    CARDAPIO[edSecao].nome = nome;
+    if (nota) CARDAPIO[edSecao].nota = nota; else delete CARDAPIO[edSecao].nota;
+  }
+  dlgSecao.close();
+  aplicouMudanca();
+  avisar(edSecao < 0 ? "Seção criada" : "Seção salva");
+});
+
+function moverSecao(passo){
+  const alvo = edSecao + passo;
+  if (alvo < 0 || alvo >= CARDAPIO.length) return;
+  [CARDAPIO[edSecao], CARDAPIO[alvo]] = [CARDAPIO[alvo], CARDAPIO[edSecao]];
+  edSecao = alvo;
+  guardar();
+  montar();
+  avisar("Seção movida");
+}
+$("secao-sobe").addEventListener("click", () => moverSecao(-1));
+$("secao-desce").addEventListener("click", () => moverSecao(1));
+
+$("secao-apagar").addEventListener("click", e => doisToques(e.currentTarget, () => {
+  CARDAPIO.splice(edSecao, 1);
+  dlgSecao.close();
+  aplicouMudanca();
+  avisar("Seção apagada");
+}));
+
+/* ---------------- reajuste em % ---------------- */
+function arredondar(v, modo){
+  if (modo === "01") return Math.round(v * 100) / 100;
+  if (modo === "50") return Math.round(v * 2) / 2;
+  if (modo === "00") return Math.round(v);
+  const baixo = Math.floor(v) - 0.01, alto = Math.floor(v) + 0.99;   // ",99"
+  const melhor = Math.abs(v - baixo) <= Math.abs(alto - v) ? baixo : alto;
+  return Math.max(0.99, Math.round(melhor * 100) / 100);
+}
+
+$("adm-reajuste").addEventListener("click", () => {
+  const sel = $("f-escopo");
+  sel.textContent = "";
+  const tudo = document.createElement("option");
+  tudo.value = "-1"; tudo.textContent = "Cardápio inteiro";
+  sel.append(tudo);
+  CARDAPIO.forEach((s, i) => {
+    const o = document.createElement("option");
+    o.value = i; o.textContent = "Só: " + s.nome;
+    sel.append(o);
+  });
+  $("f-pct").value = "";
+  $("reaj-erro").classList.remove("on");
+  desarmar($("reaj-aplicar"));
+  dlgReaj.showModal();
+});
+
+$("reaj-aplicar").addEventListener("click", e => {
+  const pct = parseFloat($("f-pct").value.replace(",", "."));
+  const erro = $("reaj-erro");
+  if (!isFinite(pct) || pct === 0 || pct <= -100){
+    erro.textContent = "Digite a porcentagem, por exemplo 10 ou -5.";
+    erro.classList.add("on");
+    return;
+  }
+  erro.classList.remove("on");
+  doisToques(e.currentTarget, () => {
+    const escopo = Number($("f-escopo").value);
+    const modo = $("f-arred").value;
+    let n = 0;
+    CARDAPIO.forEach((sec, si) => {
+      if (escopo >= 0 && si !== escopo) return;
+      sec.itens.forEach(it => {
+        if (it.preco == null) return;
+        it.preco = arredondar(it.preco * (1 + pct / 100), modo);
+        n++;
+      });
+    });
+    dlgReaj.close();
+    aplicouMudanca();
+    avisar(n + " preços reajustados");
+  });
+});
+
+/* ---------------- publicar ---------------- */
+$("adm-publicar").addEventListener("click", () => {
+  const json = JSON.stringify(CARDAPIO, null, 1);
+  $("pub-json").value = json;
+  const itens = CARDAPIO.reduce((a, s) => a + s.itens.length, 0);
+  $("pub-resumo").textContent = temAlteracao()
+    ? "Suas alterações já valem neste aparelho (" + CARDAPIO.length + " seções, " + itens +
+      " produtos), mas os clientes ainda veem a versão publicada. Mande os dados abaixo para republicar."
+    : "Nenhuma alteração pendente — esta é exatamente a versão que os clientes estão vendo.";
+  desarmar($("pub-restaurar"));
+  dlgPub.showModal();
+});
+
+$("pub-copiar").addEventListener("click", async e => {
+  const b = e.currentTarget;
+  try{
+    await navigator.clipboard.writeText($("pub-json").value);
+    b.textContent = "Copiado!";
+  }catch(err){
+    $("pub-json").select();
+    b.textContent = "Copie o texto abaixo";
+  }
+  setTimeout(() => b.textContent = "Copiar dados", 2000);
+});
+
+$("pub-baixar").addEventListener("click", e => {
+  const b = e.currentTarget;
+  try{
+    const url = URL.createObjectURL(new Blob([$("pub-json").value], {type:"application/json"}));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cardapio-boteco.json";
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }catch(err){
+    b.textContent = "Use o Copiar dados";
+    setTimeout(() => b.textContent = "Baixar arquivo", 2200);
+  }
+});
+
+$("pub-restaurar").addEventListener("click", e => doisToques(e.currentTarget, () => {
+  try{ localStorage.removeItem(CHAVE_DADOS); }catch(err){}
+  CARDAPIO = clonar(CARDAPIO_PADRAO);
+  dlgPub.close();
+  comanda.clear();
+  montar();
+  atualizar();
+  avisar("Voltou ao cardápio publicado");
+}));
+
+/* ---------------- entrar / sair ---------------- */
+async function digerir(txt){
+  const bytes = new TextEncoder().encode(txt);
+  const bin = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(bin)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function abrirLogin(){
+  $("adm-erro").classList.remove("on");
+  $("adm-senha").value = "";
+  dlgLogin.showModal();
+  $("adm-user").focus();
+}
+
+function entrarModoDono(){
+  admin = true;
+  document.body.classList.add("adm");
+  comanda.clear();
+  montar();
+  atualizar();
+}
+
+async function tentarEntrar(){
+  const usuario = $("adm-user").value.trim().toLowerCase();
+  const senha = $("adm-senha").value;
+  try{
+    if (await digerir("bdj|" + usuario + "|" + senha) === CONFIG.dono){
+      try{ localStorage.setItem(CHAVE_DONO, "1"); }catch(e){}
+      dlgLogin.close();
+      entrarModoDono();
+      avisar("Bem-vindo, João Vitor");
+      return;
+    }
+  }catch(e){}
+  $("adm-erro").classList.add("on");
+}
+$("adm-entrar").addEventListener("click", tentarEntrar);
+[$("adm-user"), $("adm-senha")].forEach(c =>
+  c.addEventListener("keydown", e => { if (e.key === "Enter") tentarEntrar(); }));
+
+$("adm-sair").addEventListener("click", () => {
+  try{ localStorage.removeItem(CHAVE_DONO); }catch(e){}
+  admin = false;
+  document.body.classList.remove("adm");
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  montar();
+});
+
+/* entrada discreta: 5 toques no logo, ou terminar o link com #dono */
+let toques = 0, toqueTimer = null;
+const selo = document.querySelector(".selo");
+if (selo) selo.addEventListener("click", () => {
+  if (admin) return;
+  toques++;
+  clearTimeout(toqueTimer);
+  toqueTimer = setTimeout(() => toques = 0, 2500);
+  if (toques >= 5){ toques = 0; abrirLogin(); }
+});
+
+try{ if (localStorage.getItem(CHAVE_DONO) === "1") { admin = true; document.body.classList.add("adm"); } }catch(e){}
+
+montar();
+atualizar();
+
+if (!admin && /^#(dono|admin)$/i.test(location.hash)) abrirLogin();
+</script>
