@@ -71,13 +71,12 @@ qx, qy = (W - lado_qr) // 2, 1560
 d.rectangle([qx - 40, qy - 40, qx + lado_qr + 40, qy + lado_qr + 40], fill="white", outline=ESCURO, width=4)
 cartaz.paste(img_qr, (qx, qy))
 
-y = qy + lado_qr + 120
-centrado(d, y, "Aponte a câmera do celular", fonte("georgiab.ttf", 92), ESCURO)
-centrado(d, y + 130, "e o cardápio abre na hora", fonte("georgia.ttf", 82), CINZA)
-centrado(d, y + 260, URL.replace("https://", ""), fonte("arial.ttf", 50), CINZA)
+y = qy + lado_qr + 150
+centrado(d, y, "Aponte a câmera do celular", fonte("georgiab.ttf", 96), ESCURO)
+centrado(d, y + 140, "e o cardápio abre na hora", fonte("georgia.ttf", 84), CINZA)
 
-d.line([W / 2 - 700, H - 300, W / 2 + 700, H - 300], fill=AMARELO, width=6)
-centrado(d, H - 250, "Pedidos e reservas: (71) 99123-2952", fonte("arialbd.ttf", 66), ESCURO)
+d.line([W / 2 - 600, y + 300, W / 2 + 600, y + 300], fill=AMARELO, width=6)
+centrado(d, y + 340, URL.replace("https://", ""), fonte("arial.ttf", 50), CINZA)
 
 png = os.path.join(BASE, "cartaz-mesa.png")
 pdf = os.path.join(BASE, "cartaz-mesa.pdf")

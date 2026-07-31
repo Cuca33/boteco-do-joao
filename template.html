@@ -287,7 +287,44 @@
   footer .zap{color:var(--texto);font-weight:600;text-decoration:none;border-bottom:2px solid var(--amarelo);padding-bottom:1px}
   footer .zap:hover{color:var(--amarelo)}
 
+  /* ---------- deslizar entre seções ---------- */
+  .chips-caixa{position:relative}
+  .chips-caixa::after{
+    content:"";position:absolute;right:-2px;top:0;bottom:12px;width:42px;pointer-events:none;
+    background:linear-gradient(90deg,rgba(0,0,0,0),var(--topo) 78%)
+  }
+  .balao{
+    position:fixed;top:14px;left:50%;transform:translate(-50%,-14px);z-index:70;
+    background:var(--texto);color:var(--bg);font-size:.86rem;font-weight:700;
+    padding:9px 16px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.3);
+    opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+    max-width:80vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+  }
+  .balao.on{opacity:.95;transform:translate(-50%,0)}
+
+  /* ---------- caixas em navegador sem <dialog> ---------- */
+  .sem-dialog dialog.comanda{display:none}
+  .sem-dialog dialog.comanda[open]{
+    display:block;position:fixed;left:0;right:0;bottom:0;top:auto;z-index:90;
+    max-height:88vh;overflow:auto
+  }
+  .sem-dialog.com-caixa body{overflow:hidden}
+
   /* ---------- painel do dono ---------- */
+  .dono-link{
+    border:0;background:none;color:var(--texto-2);font:inherit;font-size:.76rem;
+    text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+    padding:8px 10px;opacity:.75
+  }
+  .dono-link:hover{color:var(--texto);opacity:1}
+  body.adm .dono-link{display:none}
+  .adm-dica{
+    display:none;background:color-mix(in srgb,var(--tijolo) 12%,var(--painel));
+    border:1px dashed var(--tijolo);border-radius:10px;padding:11px 14px;margin:0 0 16px;
+    font-size:.85rem;color:var(--texto);line-height:1.45
+  }
+  body.adm .adm-dica{display:block}
+
   .adm-barra{
     display:none;position:sticky;top:0;z-index:60;
     background:var(--tijolo);color:#FFF3E0;box-shadow:0 4px 18px rgba(0,0,0,.28)
@@ -347,7 +384,7 @@
 
   @media print{
     body{background:#fff;color:#000;padding:0}
-    .balcao,.barra,main>.secao,.capa,footer,.qr-acoes,.adm-barra{display:none!important}
+    .balcao,.barra,main>.secao,.capa,footer,.qr-acoes,.adm-barra,.balao,.adm-dica{display:none!important}
     .qr-bloco{border:0;box-shadow:none;margin:0;padding:0}
     .qr-caixa svg{width:70mm}
   }
@@ -384,9 +421,13 @@
         <button class="limpar" id="limpar" type="button" aria-label="Limpar busca">×</button>
       </label>
     </div>
-    <nav class="chips" id="chips" aria-label="Categorias"></nav>
+    <div class="chips-caixa">
+      <nav class="chips" id="chips" aria-label="Categorias"></nav>
+    </div>
   </div>
 </div>
+
+<div class="balao" id="balao" aria-live="polite"></div>
 
 <main class="wrap" id="conteudo"></main>
 <p class="vazio wrap" id="vazio">Nada encontrado. Tente outro nome ou o código do item.</p>
@@ -408,6 +449,7 @@
   <div class="marca">Boteco do João</div>
   <div><a class="zap" href="https://wa.me/5571991232952" target="_blank" rel="noopener">Pedidos e reservas: (71) 99123-2952</a></div>
   <div>Preços sujeitos a alteração. Cervejas 600&nbsp;ml: consultar valor com o garçom.</div>
+  <div><button class="dono-link" id="abrir-dono" type="button">Área do dono</button></div>
 </footer>
 
 <button class="barra" id="barra" type="button" aria-label="Ver minha comanda">
@@ -848,6 +890,28 @@ const temAlteracao = () => JSON.stringify(CARDAPIO) !== JSON.stringify(CARDAPIO_
 const real = n => n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const semAcento = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 
+/* --- abrir/fechar caixas: <dialog> não existe em navegador antigo --- */
+const temDialog = typeof HTMLDialogElement !== "undefined" &&
+                  typeof document.createElement("dialog").showModal === "function";
+if (!temDialog) document.documentElement.classList.add("sem-dialog");
+
+function abrirDlg(d){
+  if (!d) return;
+  if (temDialog){
+    try{ d.showModal(); return; }catch(e){}
+  }
+  d.setAttribute("open", "");
+  document.documentElement.classList.add("sem-dialog", "com-caixa");
+}
+function fecharDlg(d){
+  if (!d) return;
+  if (temDialog && typeof d.close === "function" && d.open){
+    try{ d.close(); }catch(e){}
+  }
+  d.removeAttribute("open");
+  if (!document.querySelector("dialog[open]")) document.documentElement.classList.remove("com-caixa");
+}
+
 const elConteudo = document.getElementById("conteudo");
 const elChips = document.getElementById("chips");
 const elVazio = document.getElementById("vazio");
@@ -870,6 +934,13 @@ function montar(){
   elConteudo.textContent = "";
   elChips.textContent = "";
   if (observador) observador.disconnect();
+
+  const dica = document.createElement("p");
+  dica.className = "adm-dica";
+  dica.innerHTML = "<strong>Modo dono ligado.</strong> Toque em cima de qualquer produto " +
+    "para mudar o preço ou o nome. Use os botões tracejados para criar produto ou seção. " +
+    "No fim, toque em <strong>Publicar</strong>.";
+  elConteudo.append(dica);
 
   CARDAPIO.forEach((sec, si) => {
     const s = document.createElement("section");
@@ -967,13 +1038,88 @@ function montar(){
       elChips.querySelectorAll(".chip").forEach(c =>
         c.classList.toggle("ativo", c.dataset.alvo === e.target.id));
       const at = elChips.querySelector(".chip.ativo");
-      if (at) at.scrollIntoView({behavior:"smooth", block:"nearest", inline:"center"});
+      // rola SÓ a régua de abas — usar scrollIntoView aqui cancelava a rolagem
+      // da página no meio do caminho e o deslize parecia não funcionar
+      if (at) elChips.scrollTo({
+        left: Math.max(0, at.offsetLeft - (elChips.clientWidth - at.offsetWidth) / 2),
+        behavior: "smooth"
+      });
     });
   }, {rootMargin:"-130px 0px -70% 0px", threshold:0});
   document.querySelectorAll(".secao").forEach(s => observador.observe(s));
 
   filtrar();
 }
+
+/* --- deslizar para o lado troca de seção (além de tocar na aba) --- */
+function secaoAtual(){
+  const secoes = [...document.querySelectorAll(".secao")].filter(s => s.style.display !== "none");
+  if (!secoes.length) return {secoes: [], i: 0};
+  const alvo = 150;                       // logo abaixo da barra de busca
+  let i = 0, melhor = Infinity;
+  secoes.forEach((s, k) => {
+    const d = Math.abs(s.getBoundingClientRect().top - alvo);
+    if (d < melhor){ melhor = d; i = k; }
+  });
+  return {secoes, i};
+}
+
+let pendente = -1, pendenteAte = 0;
+function irParaSecao(passo){
+  const {secoes, i} = secaoAtual();
+  if (!secoes.length) return;
+  const agora = Date.now();
+
+  // dois deslizes seguidos andam duas seções, mesmo com a rolagem ainda a caminho
+  const emVoo = agora < pendenteAte && secoes[pendente];
+  const base = emVoo ? pendente : i;
+
+  let alvo = base + passo;
+  // deslizar para trás no meio de uma seção volta para o começo dela
+  if (!emVoo && passo < 0 && secoes[base].getBoundingClientRect().top < -40) alvo = base;
+  alvo = Math.max(0, Math.min(secoes.length - 1, alvo));
+
+  pendente = alvo;
+  pendenteAte = agora + 1200;
+  secoes[alvo].scrollIntoView({behavior: "smooth", block: "start"});
+  mostrarNome(secoes[alvo].querySelector("h2").textContent);
+}
+
+let nomeTimer = null;
+function mostrarNome(txt){
+  const b = document.getElementById("balao");
+  b.textContent = txt;
+  b.classList.add("on");
+  clearTimeout(nomeTimer);
+  nomeTimer = setTimeout(() => b.classList.remove("on"), 1100);
+}
+
+let tX = 0, tY = 0, tHora = 0;
+document.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1 || document.querySelector("dialog[open]")){ tHora = 0; return; }
+  const alvo = e.target;
+  // não atrapalha a régua de abas nem campos de texto
+  if (alvo.closest && (alvo.closest(".chips") || alvo.closest("input, textarea, select"))){ tHora = 0; return; }
+  tX = e.touches[0].clientX;
+  tY = e.touches[0].clientY;
+  tHora = Date.now();
+}, {passive: true});
+
+document.addEventListener("touchend", e => {
+  if (!tHora) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - tX, dy = t.clientY - tY, dt = Date.now() - tHora;
+  tHora = 0;
+  if (dt > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+  irParaSecao(dx < 0 ? 1 : -1);
+}, {passive: true});
+
+/* no computador: setas do teclado fazem o mesmo */
+document.addEventListener("keydown", e => {
+  if (document.querySelector("dialog[open]") || document.activeElement === elBusca) return;
+  if (e.key === "ArrowRight") irParaSecao(1);
+  if (e.key === "ArrowLeft") irParaSecao(-1);
+});
 
 /* --- busca --- */
 function filtrar(){
@@ -1058,7 +1204,7 @@ function atualizar(){
       const v = comanda.get(k) - 1;
       if (v <= 0) comanda.delete(k); else comanda.set(k, v);
       atualizar();
-      if (comanda.size === 0 && dlg.open) dlg.close();
+      if (comanda.size === 0 && dlg.open) fecharDlg(dlg);
     });
     mais.addEventListener("click", () => { comanda.set(k, comanda.get(k) + 1); atualizar(); });
     qtdBox.append(menos, conta, mais);
@@ -1072,12 +1218,12 @@ function atualizar(){
   });
 }
 
-elBarra.addEventListener("click", () => dlg.showModal());
-document.getElementById("fechar").addEventListener("click", () => dlg.close());
+elBarra.addEventListener("click", () => abrirDlg(dlg));
+document.getElementById("fechar").addEventListener("click", () => fecharDlg(dlg));
 document.getElementById("limpar-comanda").addEventListener("click", () => {
-  comanda.clear(); atualizar(); dlg.close();
+  comanda.clear(); atualizar(); fecharDlg(dlg);
 });
-dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+dlg.addEventListener("click", e => { if (e.target === dlg) fecharDlg(dlg); });
 
 function textoPedido(){
   const linhas = ["*Pedido — " + CONFIG.nome + "*", ""];
@@ -1138,9 +1284,9 @@ const dlgLogin = $("dlg-login"), dlgItem = $("dlg-item"), dlgSecao = $("dlg-seca
       dlgReaj = $("dlg-reajuste"), dlgPub = $("dlg-publicar");
 
 document.querySelectorAll("[data-fecha]").forEach(b =>
-  b.addEventListener("click", () => b.closest("dialog").close()));
+  b.addEventListener("click", () => fecharDlg(b.closest("dialog"))));
 document.querySelectorAll(".adm-dlg").forEach(d =>
-  d.addEventListener("click", e => { if (e.target === d) d.close(); }));
+  d.addEventListener("click", e => { if (e.target === d) fecharDlg(d); }));
 
 let avisoTimer = null;
 function avisar(txt){
@@ -1213,7 +1359,7 @@ function abrirItem(si, ii){
   $("item-mover").style.display = novo ? "none" : "";
   $("item-apagar").style.display = novo ? "none" : "";
   desarmar($("item-apagar"));
-  dlgItem.showModal();
+  abrirDlg(dlgItem);
   if (novo) $("f-nome").focus();
 }
 
@@ -1246,7 +1392,7 @@ $("item-salvar").addEventListener("click", () => {
     CARDAPIO[edItem.si].itens.splice(edItem.ii, 1);
     CARDAPIO[destino].itens.push(novo);
   }
-  dlgItem.close();
+  fecharDlg(dlgItem);
   aplicouMudanca();
   avisar(edItem.ii < 0 ? "Produto adicionado" : "Produto salvo");
 });
@@ -1267,7 +1413,7 @@ $("item-desce").addEventListener("click", () => moverItem(1));
 
 $("item-apagar").addEventListener("click", e => doisToques(e.currentTarget, () => {
   CARDAPIO[edItem.si].itens.splice(edItem.ii, 1);
-  dlgItem.close();
+  fecharDlg(dlgItem);
   aplicouMudanca();
   avisar("Produto apagado");
 }));
@@ -1286,7 +1432,7 @@ function abrirSecao(si){
   $("secao-mover").style.display = nova ? "none" : "";
   $("secao-apagar").style.display = nova ? "none" : "";
   desarmar($("secao-apagar"));
-  dlgSecao.showModal();
+  abrirDlg(dlgSecao);
   if (nova) $("f-secnome").focus();
 }
 
@@ -1307,7 +1453,7 @@ $("secao-salvar").addEventListener("click", () => {
     CARDAPIO[edSecao].nome = nome;
     if (nota) CARDAPIO[edSecao].nota = nota; else delete CARDAPIO[edSecao].nota;
   }
-  dlgSecao.close();
+  fecharDlg(dlgSecao);
   aplicouMudanca();
   avisar(edSecao < 0 ? "Seção criada" : "Seção salva");
 });
@@ -1326,7 +1472,7 @@ $("secao-desce").addEventListener("click", () => moverSecao(1));
 
 $("secao-apagar").addEventListener("click", e => doisToques(e.currentTarget, () => {
   CARDAPIO.splice(edSecao, 1);
-  dlgSecao.close();
+  fecharDlg(dlgSecao);
   aplicouMudanca();
   avisar("Seção apagada");
 }));
@@ -1355,7 +1501,7 @@ $("adm-reajuste").addEventListener("click", () => {
   $("f-pct").value = "";
   $("reaj-erro").classList.remove("on");
   desarmar($("reaj-aplicar"));
-  dlgReaj.showModal();
+  abrirDlg(dlgReaj);
 });
 
 $("reaj-aplicar").addEventListener("click", e => {
@@ -1379,7 +1525,7 @@ $("reaj-aplicar").addEventListener("click", e => {
         n++;
       });
     });
-    dlgReaj.close();
+    fecharDlg(dlgReaj);
     aplicouMudanca();
     avisar(n + " preços reajustados");
   });
@@ -1395,7 +1541,7 @@ $("adm-publicar").addEventListener("click", () => {
       " produtos), mas os clientes ainda veem a versão publicada. Mande os dados abaixo para republicar."
     : "Nenhuma alteração pendente — esta é exatamente a versão que os clientes estão vendo.";
   desarmar($("pub-restaurar"));
-  dlgPub.showModal();
+  abrirDlg(dlgPub);
 });
 
 $("pub-copiar").addEventListener("click", async e => {
@@ -1430,7 +1576,7 @@ $("pub-baixar").addEventListener("click", e => {
 $("pub-restaurar").addEventListener("click", e => doisToques(e.currentTarget, () => {
   try{ localStorage.removeItem(CHAVE_DADOS); }catch(err){}
   CARDAPIO = clonar(CARDAPIO_PADRAO);
-  dlgPub.close();
+  fecharDlg(dlgPub);
   comanda.clear();
   montar();
   atualizar();
@@ -1438,16 +1584,63 @@ $("pub-restaurar").addEventListener("click", e => doisToques(e.currentTarget, ()
 }));
 
 /* ---------------- entrar / sair ---------------- */
-async function digerir(txt){
-  const bytes = new TextEncoder().encode(txt);
-  const bin = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(bin)].map(b => b.toString(16).padStart(2, "0")).join("");
+/* SHA-256 escrito à mão de propósito: o crypto.subtle do navegador some em
+   página aberta fora de https (e em WebView antigo), e aí ninguém entrava. */
+function digerir(txt){
+  const K = [
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+  ];
+  let h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+
+  // texto -> bytes UTF-8
+  const bytes = [];
+  for (const ch of unescape(encodeURIComponent(txt))) bytes.push(ch.charCodeAt(0));
+
+  const bits = bytes.length * 8;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) bytes.push(0);
+  for (let i = 7; i >= 0; i--) bytes.push(Math.floor(bits / Math.pow(2, i * 8)) & 0xff);
+
+  const gira = (x, n) => (x >>> n) | (x << (32 - n));
+  const w = new Array(64);
+
+  for (let bloco = 0; bloco < bytes.length; bloco += 64){
+    for (let i = 0; i < 16; i++){
+      const j = bloco + i * 4;
+      w[i] = (bytes[j] << 24 | bytes[j+1] << 16 | bytes[j+2] << 8 | bytes[j+3]) >>> 0;
+    }
+    for (let i = 16; i < 64; i++){
+      const s0 = gira(w[i-15], 7) ^ gira(w[i-15], 18) ^ (w[i-15] >>> 3);
+      const s1 = gira(w[i-2], 17) ^ gira(w[i-2], 19) ^ (w[i-2] >>> 10);
+      w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+    }
+    let [a,b,c,d,e,f,g,hh] = h;
+    for (let i = 0; i < 64; i++){
+      const S1 = gira(e, 6) ^ gira(e, 11) ^ gira(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (hh + S1 + ch + K[i] + w[i]) >>> 0;
+      const S0 = gira(a, 2) ^ gira(a, 13) ^ gira(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + maj) >>> 0;
+      hh = g; g = f; f = e; e = (d + t1) >>> 0;
+      d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    h = [h[0]+a, h[1]+b, h[2]+c, h[3]+d, h[4]+e, h[5]+f, h[6]+g, h[7]+hh].map(x => x >>> 0);
+  }
+  return h.map(x => x.toString(16).padStart(8, "0")).join("");
 }
 
 function abrirLogin(){
   $("adm-erro").classList.remove("on");
   $("adm-senha").value = "";
-  dlgLogin.showModal();
+  abrirDlg(dlgLogin);
   $("adm-user").focus();
 }
 
@@ -1459,13 +1652,13 @@ function entrarModoDono(){
   atualizar();
 }
 
-async function tentarEntrar(){
+function tentarEntrar(){
   const usuario = $("adm-user").value.trim().toLowerCase();
-  const senha = $("adm-senha").value;
+  const senha = $("adm-senha").value.trim();
   try{
-    if (await digerir("bdj|" + usuario + "|" + senha) === CONFIG.dono){
+    if (digerir("bdj|" + usuario + "|" + senha) === CONFIG.dono){
       try{ localStorage.setItem(CHAVE_DONO, "1"); }catch(e){}
-      dlgLogin.close();
+      fecharDlg(dlgLogin);
       entrarModoDono();
       avisar("Bem-vindo, João Vitor");
       return;
@@ -1484,6 +1677,9 @@ $("adm-sair").addEventListener("click", () => {
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   montar();
 });
+
+/* entrada pelo rodapé — é a que sempre funciona no celular */
+$("abrir-dono").addEventListener("click", () => { if (!admin) abrirLogin(); });
 
 /* entrada discreta: 5 toques no logo, ou terminar o link com #dono */
 let toques = 0, toqueTimer = null;
