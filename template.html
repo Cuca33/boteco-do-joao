@@ -346,7 +346,10 @@
   #dlg-cadastro[data-tipo="entrega"] .so-mesa{display:none}
   #dlg-cadastro[data-tipo="retirada"] .so-entrega,
   #dlg-cadastro[data-tipo="retirada"] .so-mesa{display:none}
-  #dlg-cadastro[data-tipo="mesa"] .so-entrega{display:none}
+  #dlg-cadastro[data-tipo="mesa"] .so-entrega,
+  #dlg-cadastro[data-tipo="mesa"] .so-cadastro,
+  #dlg-cadastro[data-tipo="mesa"] .dica-guarda{display:none}
+  .so-cadastro{display:flex;flex-direction:column;gap:13px}
   .campo input.falta{border-color:#C0392B;background:color-mix(in srgb,#C0392B 7%,var(--bg))}
 
   /* ---------- painel do dono ---------- */
@@ -530,18 +533,21 @@
       <button class="tipo" type="button" data-tipo="mesa">Estou na mesa</button>
     </div>
 
-    <div class="campo">
-      <label for="c-nome">Seu nome</label>
-      <input id="c-nome" autocomplete="name" autocapitalize="words" placeholder="Nome e sobrenome">
-    </div>
-    <div class="campo">
-      <label for="c-fone">Telefone / WhatsApp</label>
-      <input id="c-fone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(71) 9 9999-9999">
-    </div>
-
     <div class="campo so-mesa">
       <label for="c-mesa">Número da mesa</label>
       <input id="c-mesa" inputmode="numeric" placeholder="ex.: 7">
+      <p class="dica">Só isso: o garçom leva o pedido até você.</p>
+    </div>
+
+    <div class="so-cadastro">
+      <div class="campo">
+        <label for="c-nome">Seu nome</label>
+        <input id="c-nome" autocomplete="name" autocapitalize="words" placeholder="Nome e sobrenome">
+      </div>
+      <div class="campo">
+        <label for="c-fone">Telefone / WhatsApp</label>
+        <input id="c-fone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(71) 9 9999-9999">
+      </div>
     </div>
 
     <div class="so-entrega">
@@ -578,7 +584,7 @@
       <input id="c-obs" placeholder="opcional — ex.: sem cebola, troco para R$ 100">
     </div>
     <p class="erro" id="c-erro"></p>
-    <p class="dica">Seus dados ficam guardados só neste celular, para não digitar tudo de novo na próxima vez.</p>
+    <p class="dica dica-guarda">Seus dados ficam guardados só neste celular, para não digitar tudo de novo na próxima vez.</p>
   </div>
   <div class="rodape-comanda">
     <div class="total"><span>Total</span><span id="c-total">R$ 0,00</span></div>
@@ -1393,11 +1399,17 @@ document.querySelectorAll("#tipos .tipo").forEach(b => b.addEventListener("click
   dlgCad.dataset.tipo = b.dataset.tipo;
   document.querySelectorAll("#tipos .tipo").forEach(o => o.classList.toggle("ativo", o === b));
   document.getElementById("c-erro").classList.remove("on");
+  if (b.dataset.tipo === "mesa") setTimeout(() => document.getElementById("c-mesa").focus(), 60);
 }));
 
 function faltando(){
   const c = lerCliente();
   const falta = [];
+  // na mesa o cliente ja esta na casa: basta dizer qual e a mesa
+  if (c.tipo === "mesa"){
+    if (!c.mesa) falta.push("mesa");
+    return falta;
+  }
   if (!c.nome) falta.push("nome");
   if (c.fone.replace(/\D/g, "").length < 10) falta.push("fone");
   if (c.tipo === "entrega"){
@@ -1406,7 +1418,6 @@ function faltando(){
     if (!c.bairro) falta.push("bairro");
     if (!c.cidade) falta.push("cidade");
   }
-  if (c.tipo === "mesa" && !c.mesa) falta.push("mesa");
   return falta;
 }
 
