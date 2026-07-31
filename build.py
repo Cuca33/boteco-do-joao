@@ -65,10 +65,15 @@ else:
            'quando a p&aacute;gina for publicada</div>')
     rotulo = "publicando..."
 
+# endereco absoluto usado nas meta tags (previa do link no WhatsApp)
+pagina = url if url.endswith("/") or not url else url + "/"
+
 saida = (tpl.replace("__HERO_B64__", hero)
             .replace("__LOGO_B64__", logo)
+            .replace("__FAVICON_B64__", ler_b64("favicon.b64"))
             .replace("__QR_SVG__", svg)
             .replace("__QR_URL__", rotulo)
+            .replace("__PAGINA__", pagina)
             .replace("__VERSAO__", versao))
 
 destino = os.path.join(BASE, "index.html")
